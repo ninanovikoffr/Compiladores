@@ -1,0 +1,19 @@
+// Este é um comentário simples
+int $x =  5;
+float $y = 3.14;
+
+if ($x > $y) {
+    print($x);
+} else {
+    read($y);
+}
+
+while ($x != 0) {
+    $x = $x - 1;
+}
+
+$identificador1 = 10;
+variavel2 = -5;
+"ncsnsjv
+
+print(Fim do teste);
