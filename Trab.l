@@ -3,7 +3,23 @@
 %{
 /*------Definitions--------*/
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 int column_number = 1;
+
+#define TAM_TABELA 101
+
+typedef struct Simbolo {
+    char lexema[100];
+    int token;
+    struct Simbolo *prox;
+} Simbolo;
+
+Simbolo *tabela[TAM_TABELA];
+unsigned int hash(const char *str);
+Simbolo* buscarOuInserirSimbolo(const char *lexema, int token);
+void imprimirTabela();
 
 //Tokens
 #define DELIMITADOR				11
@@ -53,7 +69,7 @@ int yylval;
 
 delim				[;,(){}]
 identificador		"$"[a-zA-Z0-9]+
-numero				(-?[0-9]+)|([0-9]*("."[0-9]+)?)
+numero				(-?[0-9]+)|([0-9]+("."[0-9]+)?)
 ws					[ \t]
 quebraLinha			\n
 comentario			"//".*
@@ -95,7 +111,7 @@ invalido			.
 "float"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; return TIPO_DADO; }
 
 {numero}				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO"); column_number += yyleng; return NUMERO; }
-{identificador}			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "IDENTIFICADOR"); column_number += yyleng; return IDENTIFICADOR; }
+{identificador}			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "IDENTIFICADOR"); column_number += yyleng; buscarOuInserirSimbolo(yytext, IDENTIFICADOR); return IDENTIFICADOR; }
 {comentario}			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "COMENTARIO"); column_number += yyleng; return COMENTARIO; }
 {comentarioPlus}		{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "COMENTARIO"); column_number += yyleng; return COMENTARIO; }
 {delim}					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return DELIMITADOR; }
@@ -109,6 +125,53 @@ invalido			.
 %%
 /*------User subrotines--------*/
 
+unsigned int hash(const char *str) {
+    unsigned int h = 0;
+
+    while (*str) {
+        h = h * 31 + (unsigned char)(*str);
+        str++;
+    }
+
+    return h % TAM_TABELA;
+}
+
+Simbolo* buscarOuInserirSimbolo(const char *lexema, int token) {
+    unsigned int indice = hash(lexema);
+    Simbolo *atual = tabela[indice];
+
+    while (atual != NULL) {
+        if (strcmp(atual->lexema, lexema) == 0) {
+            return atual;
+        }
+        atual = atual->prox;
+    }
+
+    Simbolo *novo = malloc(sizeof(Simbolo));
+    strcpy(novo->lexema, lexema);
+    novo->token = token;
+    novo->prox = tabela[indice];
+    tabela[indice] = novo;
+	return novo;
+}
+
+void imprimirTabela() {
+	printf("\n\nTabela de Símbolos");
+    printf("\n%-6s %-20s %-10s\n", "HASH", "LEXEMA", "TOKEN");
+    printf("--------------------------------------\n");
+
+    for (int i = 0; i < TAM_TABELA; i++) {
+        Simbolo *atual = tabela[i];
+
+        while (atual != NULL) {
+            printf("%-6d %-20s %-10d\n", i, atual->lexema, atual->token);
+            atual = atual->prox;
+        }
+    }
+	printf("--------------------------------------\n");
+}
+
+
 int main(int argc, char *argv[]){
 	yyin = fopen(argv[1], "r");
 	yyout= stdout;
@@ -117,6 +180,9 @@ int main(int argc, char *argv[]){
 	fprintf(yyout, "-------------------------------------------------------------\n");
 
 	while (yylex() !=0){}
+
+	imprimirTabela();
+
 	fclose(yyin);
 	return 0;
 }
