@@ -1,0 +1,51 @@
+/* Comentário de múltiplas linhas
+fechado corretamente */
+// Comentário de uma linha
+
+int $x = 10;
+float $y = 25.5;
+bool $flag = true;
+bool $flag2 = false;
+
+$x = $x + 1;
+$y = $y / 2.0;
+$flag = ! $flag;
+
+if ($x < 20 && $flag == true) {
+    print("texto literal fechado");
+}
+else {
+    read($x);
+}
+
+while ($x != 0 || $y >= 1.0) {
+    $x = $x - 1;
+    $y = $y * 3.5;
+    return;
+}
+
+( ) { } ; ,
+< > == <= >= !=
++ - * /
+&& || !
+=
+
+123
+45.67
+-99
+0
+
+$x
+$abc123
+$A1
+
+-0
+001
+-012
+-3.14
+12,34
+abc
+"literal aberto
+@
+
+/* comentário de múltiplas linhas não fechado
