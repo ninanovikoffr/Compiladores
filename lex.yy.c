@@ -373,8 +373,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 33
-#define YY_END_OF_BUFFER 34
+#define YY_NUM_RULES 40
+#define YY_END_OF_BUFFER 41
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -382,16 +382,17 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[74] =
+static const flex_int16_t yy_accept[84] =
     {   0,
-        0,    0,   34,   32,   28,   27,   13,   29,   32,   32,
-       25,    9,    7,    8,   10,   21,    1,   32,    2,   31,
-       31,   31,   31,   31,   31,   31,   32,    6,   29,   26,
-       22,   11,   21,    0,   23,    0,    0,   21,    4,    3,
-        5,   31,   31,   31,   14,   31,   31,   31,   31,   12,
-        0,    0,   23,   30,   21,   31,   31,   19,   31,   31,
-       31,    0,   24,   15,   31,   31,   18,   31,    0,   20,
-       17,   16,    0
+        0,    0,   41,   39,   35,   34,   16,   36,   39,   39,
+       32,   12,   10,   11,   13,   29,   29,    1,   25,    2,
+       38,   38,   38,   38,   38,   38,   38,   39,    6,   36,
+       33,   31,   14,   26,   29,    9,    8,    0,    0,   27,
+       29,    4,    3,    5,   38,   38,   38,   17,   38,   38,
+       38,   38,   15,    0,   27,    9,    0,    8,   37,   30,
+       38,   38,   23,   38,   38,   38,   38,   28,    9,    7,
+       18,   38,   38,   21,   38,   38,    9,   24,   20,   38,
+       19,   22,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -400,16 +401,16 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    2,    4,    5,    1,    6,    1,    7,    1,    8,
-        8,    9,   10,   11,   12,   13,   14,   15,   15,   15,
-       15,   15,   15,   15,   15,   15,   15,    1,    8,   16,
-       17,   18,    1,    1,   19,   19,   19,   19,   19,   19,
-       19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
-       19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
-        1,    1,    1,    1,    1,    1,   20,   19,   19,   21,
+        8,    9,   10,   11,   12,   13,   14,   15,   16,   16,
+       16,   16,   16,   16,   16,   16,   16,    1,    8,   17,
+       18,   19,    1,    1,   20,   20,   20,   20,   20,   20,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+        1,    1,    1,    1,    1,    1,   21,   20,   20,   22,
 
-       22,   23,   19,   24,   25,   19,   19,   26,   19,   27,
-       28,   29,   19,   30,   31,   32,   19,   19,   33,   19,
-       19,   19,    8,   34,    8,    1,    1,    1,    1,    1,
+       23,   24,   20,   25,   26,   20,   20,   27,   20,   28,
+       29,   30,   20,   31,   32,   33,   34,   20,   35,   20,
+       20,   20,    8,   36,    8,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -426,81 +427,92 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[35] =
+static const YY_CHAR yy_meta[37] =
     {   0,
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    3,    1,    1,    1,    3,    3,
+        1,    1,    1,    1,    3,    3,    1,    1,    1,    3,
         3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    1
+        3,    3,    3,    3,    3,    1
     } ;
 
-static const flex_int16_t yy_base[81] =
+static const flex_int16_t yy_base[91] =
     {   0,
-        0,    0,  102,  103,  103,  103,   84,   95,    0,   92,
-      103,  103,  103,   83,   26,   26,   80,   79,   78,    0,
-       68,   67,   15,   62,   69,   66,   55,  103,   83,  103,
-        0,  103,   32,   78,    0,   71,   70,   33,  103,  103,
-      103,    0,   53,   55,    0,   50,   56,   60,   54,  103,
-       69,   36,    0,   62,   61,   53,   54,    0,   46,   51,
-       38,   40,  103,    0,   26,   23,    0,   31,   42,    0,
-        0,    0,  103,   56,   49,   33,   59,   62,   65,   68
+        0,    0,  137,  138,  138,  138,  118,  130,    0,  127,
+      138,  138,  138,   22,   30,   30,   36,  115,  114,  113,
+        0,  103,  102,   26,   97,  104,  101,   89,  138,  119,
+      138,    0,  138,   42,   48,  114,    0,   50,   52,   58,
+       64,  138,  138,  138,    0,   90,   92,    0,   87,   93,
+       27,   92,  138,   66,   72,  101,   75,    0,   75,   77,
+       81,   79,    0,   71,   76,   52,   51,   79,   87,  138,
+        0,   43,   39,    0,   39,   39,   88,    0,    0,   28,
+        0,    0,  138,  102,   39,   37,  105,  108,  111,  114
     } ;
 
-static const flex_int16_t yy_def[81] =
+static const flex_int16_t yy_def[91] =
     {   0,
-       73,    1,   73,   73,   73,   73,   73,   74,   75,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   76,
-       76,   76,   76,   76,   76,   76,   73,   73,   74,   73,
-       75,   73,   73,   77,   78,   73,   73,   73,   73,   73,
-       73,   76,   76,   76,   76,   76,   76,   76,   76,   73,
-       77,   79,   78,   73,   73,   76,   76,   76,   76,   76,
-       76,   80,   73,   76,   76,   76,   76,   76,   80,   76,
-       76,   76,    0,   73,   73,   73,   73,   73,   73,   73
+       83,    1,   83,   83,   83,   83,   83,   84,   85,   83,
+       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
+       86,   86,   86,   86,   86,   86,   86,   83,   83,   84,
+       83,   85,   83,   83,   83,   87,   88,   83,   83,   83,
+       83,   83,   83,   83,   86,   86,   86,   86,   86,   86,
+       86,   86,   83,   83,   83,   87,   89,   88,   83,   83,
+       86,   86,   86,   86,   86,   86,   86,   83,   90,   83,
+       86,   86,   86,   86,   86,   86,   90,   86,   86,   86,
+       86,   86,    0,   83,   83,   83,   83,   83,   83,   83
     } ;
 
-static const flex_int16_t yy_nxt[138] =
+static const flex_int16_t yy_nxt[175] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
-       11,   14,    4,   15,   16,   17,   18,   19,   20,   20,
-       20,   21,   22,   20,   23,   20,   20,   20,   24,   25,
-       20,   20,   26,   27,   34,   42,   36,   45,   37,   35,
-       38,   46,   36,   36,   52,   37,   33,   38,   52,   63,
-       52,   31,   72,   51,   71,   51,   29,   70,   29,   51,
-       51,   51,   53,   68,   53,   62,   62,   62,   69,   69,
-       69,   67,   66,   65,   64,   55,   54,   52,   61,   60,
-       59,   58,   57,   56,   55,   54,   52,   30,   50,   49,
-       48,   47,   44,   43,   41,   40,   39,   33,   32,   30,
+       11,   14,    4,   15,   16,   17,   18,   19,   20,   21,
+       21,   21,   22,   23,   21,   24,   21,   21,   21,   25,
+       26,   21,   21,   21,   27,   28,   34,   35,   36,   45,
+       38,   32,   39,   37,   40,   40,   38,   65,   39,   48,
+       41,   41,   38,   49,   54,   82,   55,   55,   38,   66,
+       54,   81,   35,   35,   59,   59,   60,   60,   38,   80,
+       39,   79,   40,   40,   38,   78,   39,   76,   41,   41,
+       68,   68,   38,   57,   54,   75,   55,   55,   70,   59,
+       59,   60,   60,   68,   68,   57,   57,   74,   73,   72,
 
-       28,   73,    3,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73
+       56,   56,   30,   71,   30,   56,   56,   56,   58,   57,
+       58,   69,   69,   69,   77,   77,   77,   67,   64,   63,
+       62,   61,   57,   31,   53,   52,   51,   50,   47,   46,
+       44,   43,   42,   33,   31,   29,   83,    3,   83,   83,
+       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
+       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
+       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
+       83,   83,   83,   83
     } ;
 
-static const flex_int16_t yy_chk[138] =
+static const flex_int16_t yy_chk[175] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,   15,   76,   16,   23,   16,   15,
-       16,   23,   33,   38,   52,   38,   33,   38,   62,   52,
-       69,   75,   68,   62,   66,   69,   74,   65,   74,   77,
-       77,   77,   78,   61,   78,   79,   79,   79,   80,   80,
-       80,   60,   59,   57,   56,   55,   54,   51,   49,   48,
-       47,   46,   44,   43,   37,   36,   34,   29,   27,   26,
-       25,   24,   22,   21,   19,   18,   17,   14,   10,    8,
+        1,    1,    1,    1,    1,    1,   14,   14,   15,   86,
+       16,   85,   16,   15,   16,   16,   17,   51,   17,   24,
+       17,   17,   34,   24,   34,   80,   34,   34,   35,   51,
+       35,   76,   35,   35,   38,   38,   39,   39,   40,   75,
+       40,   73,   40,   40,   41,   72,   41,   67,   41,   41,
+       54,   54,   55,   57,   55,   66,   55,   55,   57,   59,
+       59,   60,   60,   68,   68,   69,   77,   65,   64,   62,
 
-        7,    3,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73
+       69,   77,   84,   61,   84,   87,   87,   87,   88,   56,
+       88,   89,   89,   89,   90,   90,   90,   52,   50,   49,
+       47,   46,   36,   30,   28,   27,   26,   25,   23,   22,
+       20,   19,   18,   10,    8,    7,    3,   83,   83,   83,
+       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
+       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
+       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
+       83,   83,   83,   83
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[34] =
+static const flex_int32_t yy_rule_can_match_eol[41] =
     {   0,
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0,     };
+0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
+    0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -530,60 +542,72 @@ int column_number = 1;
 typedef struct Simbolo {
     char lexema[100];
     int token;
+    int ocorrencias;
     struct Simbolo *prox;
 } Simbolo;
 
 Simbolo *tabela[TAM_TABELA];
 unsigned int hash(const char *str);
-Simbolo* buscarOuInserirSimbolo(const char *lexema, int token);
+Simbolo* buscarOuInserirSimbolo(const char *lexema);
 void imprimirTabela();
 
+typedef union {
+    int inteiro;
+    char *texto;
+    char caractere;
+    Simbolo *simbolo;
+} TYPE;
+
+TYPE yylval;
+
 //Tokens
+#define LITERAL                 10
 #define DELIMITADOR				11
 #define OPERADOR_RELACIONAL 	12
 #define OPERADOR_ARITMETICO		13
-#define OPERADOR_LOGICO			14
-#define PALAVRA_RESERVADA		15
+#define OPERADOR_LOGICO    		14
 #define TIPO_DADO				16
-#define NUMERO					17
+#define NUMERO_INT				17
+#define NUMERO_FLOAT			15
 #define IDENTIFICADOR			18
 #define COMENTARIO				19
 
 //Tipos de dados
-#define TD_INTEGER  	21
-#define TD_FLOAT		22
+#define TD_INTEGER  	        21
+#define TD_FLOAT		        22
 
 //Palavras reservadas
-#define PR_IF			31
-#define PR_ELSE			32
-#define PR_WHILE		33
-#define PR_PRINT		34
-#define PR_READ			35
+#define PR_IF			        31
+#define PR_ELSE			        32
+#define PR_WHILE		        33
+#define PR_PRINT		        34
+#define PR_READ			        35
+#define PR_RETURN               36
 
 //Operadores lógicos
-#define OL_AND			41
-#define OL_OR			42
-#define OL_NOT			43
+#define OL_AND			        41
+#define OL_OR			        42
+#define OL_NOT			        43
 
 //Operadores aritméticos
-#define OA_SQR			51
-#define OA_SQRT			52
-#define OA_SIN			53
-#define OA_COS			54
-#define OA_TAN			55
+#define OA_PLUS			        51
+#define OA_MINUS		        52
+#define OA_MULT		            53
+#define OA_DIV                  54
 
 //Operadores relacionais
-#define OR_LT			61
-#define OR_GT			62
-#define OR_EQ			63
-#define OR_LE			64
-#define OR_GE			65
-#define OR_NE			66
+#define OR_LT			        61
+#define OR_GT			        62
+#define OR_EQ			        63
+#define OR_LE			        64
+#define OR_GE			        65
+#define OR_NE			        66
 
-int yylval;
+//Operador de atribuição
+#define OPERADOR_ATRIBUICAO     71
 
-#line 586 "lex.yy.c"
-#line 587 "lex.yy.c"
+#line 610 "lex.yy.c"
+#line 611 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -800,14 +824,14 @@ YY_DECL
 		}
 
 	{
-#line 83 "Trab.l"
+#line 100 "Trab.l"
 
 
-#line 86 "Trab.l"
+#line 103 "Trab.l"
 /*------Rules--------*/
 
 
-#line 811 "lex.yy.c"
+#line 835 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -834,13 +858,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 74 )
+				if ( yy_current_state >= 84 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 103 );
+		while ( yy_base[yy_current_state] != 138 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -876,172 +900,208 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 89 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; return OPERADOR_RELACIONAL; }
+#line 106 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_LT; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 90 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; return OPERADOR_RELACIONAL; }
+#line 107 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_GT; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 91 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; return OPERADOR_RELACIONAL; }
+#line 108 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_EQ; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 92 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; return OPERADOR_RELACIONAL; }
+#line 109 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_LE; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 93 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; return OPERADOR_RELACIONAL; }
+#line 110 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_GE; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 94 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; return OPERADOR_RELACIONAL; }
+#line 111 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_NE; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 7:
+/* rule 7 can match eol */
 YY_RULE_SETUP
-#line 96 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; return OPERADOR_ARITMETICO; }
+#line 113 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "COMENTARIO"); column_number += yyleng; return COMENTARIO; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 97 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; return OPERADOR_ARITMETICO; }
+#line 114 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "COMENTARIO"); column_number += yyleng; return COMENTARIO; }
 	YY_BREAK
 case 9:
+/* rule 9 can match eol */
 YY_RULE_SETUP
-#line 98 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; return OPERADOR_ARITMETICO; }
+#line 115 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: comentários de múltiplas linhas devem ser fechados com \"*/\""); column_number += yyleng; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 99 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; return OPERADOR_ARITMETICO; }
+#line 117 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_PLUS; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 101 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; return OPERADOR_LOGICO; }
+#line 118 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_MINUS; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 102 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; return OPERADOR_LOGICO; }
+#line 119 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_MULT; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 103 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; return OPERADOR_LOGICO; }
+#line 120 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_DIV; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 105 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PALAVRA_RESERVADA; }
+#line 122 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_AND; return OPERADOR_LOGICO; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 106 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PALAVRA_RESERVADA; }
+#line 123 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_OR; return OPERADOR_LOGICO; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 107 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PALAVRA_RESERVADA; }
+#line 124 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_NOT; return OPERADOR_LOGICO; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 108 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PALAVRA_RESERVADA; }
+#line 126 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_IF; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 109 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PALAVRA_RESERVADA; }
+#line 127 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_ELSE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 111 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; return TIPO_DADO; }
+#line 128 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_WHILE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 112 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; return TIPO_DADO; }
+#line 129 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_PRINT; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 114 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO"); column_number += yyleng; return NUMERO; }
+#line 130 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_READ; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 115 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "IDENTIFICADOR"); column_number += yyleng; buscarOuInserirSimbolo(yytext, IDENTIFICADOR); return IDENTIFICADOR; }
+#line 131 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_RETURN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 116 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "COMENTARIO"); column_number += yyleng; return COMENTARIO; }
+#line 133 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_INTEGER; return TIPO_DADO; }
 	YY_BREAK
 case 24:
-/* rule 24 can match eol */
 YY_RULE_SETUP
-#line 117 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "COMENTARIO"); column_number += yyleng; return COMENTARIO; }
+#line 134 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_FLOAT; return TIPO_DADO; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 118 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return DELIMITADOR; }
+#line 136 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ATRIBUICAO"); column_number += yyleng; return OPERADOR_ATRIBUICAO; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 119 "Trab.l"
-{ column_number += yyleng; }
+#line 138 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: o valor zero não pode ser negativo"); column_number += yyleng; }
 	YY_BREAK
 case 27:
-/* rule 27 can match eol */
 YY_RULE_SETUP
-#line 120 "Trab.l"
-{ column_number = 1; }
+#line 139 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: 0 a esquerda"); column_number += yyleng; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 121 "Trab.l"
-{ column_number += yyleng; }
+#line 140 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: pontos flutuantes não podem assumir valores negativos"); column_number += yyleng; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 122 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: literais devem ser fechados com aspas"); column_number += yyleng; }
+#line 141 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO INTEIRO"); column_number += yyleng; yylval.inteiro = atoi(yytext); return NUMERO_INT; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 123 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: números em ponto flutuante devem usar \".\" e não \",\""); column_number += yyleng; }
+#line 142 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO FLOAT"); column_number += yyleng; yylval.inteiro = atof(yytext); return NUMERO_FLOAT; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 124 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: identificadores devem começar com \"$\""); column_number += yyleng; }
+#line 143 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "IDENTIFICADOR"); column_number += yyleng; yylval.simbolo = buscarOuInserirSimbolo(yytext); return IDENTIFICADOR; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 125 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: caractere inválido"); column_number += yyleng; }
+#line 144 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; yylval.caractere = yytext[0]; return DELIMITADOR; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 126 "Trab.l"
+#line 145 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "LITERAL"); column_number += yyleng; return LITERAL; }
+	YY_BREAK
+case 34:
+/* rule 34 can match eol */
+YY_RULE_SETUP
+#line 146 "Trab.l"
+{ column_number = 1; }
+	YY_BREAK
+case 35:
+YY_RULE_SETUP
+#line 147 "Trab.l"
+{ column_number += yyleng; }
+	YY_BREAK
+case 36:
+YY_RULE_SETUP
+#line 148 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: literais devem ser fechados com aspas"); column_number += yyleng; }
+	YY_BREAK
+case 37:
+YY_RULE_SETUP
+#line 149 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: pontos flutuantes devem usar \".\" e não \",\""); column_number += yyleng; }
+	YY_BREAK
+case 38:
+YY_RULE_SETUP
+#line 150 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: identificadores devem começar com \"$\""); column_number += yyleng; }
+	YY_BREAK
+case 39:
+YY_RULE_SETUP
+#line 151 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: caractere inválido"); column_number += yyleng; }
+	YY_BREAK
+case 40:
+YY_RULE_SETUP
+#line 152 "Trab.l"
 ECHO;
 	YY_BREAK
-#line 1045 "lex.yy.c"
+#line 1105 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1338,7 +1398,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 74 )
+			if ( yy_current_state >= 84 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1366,11 +1426,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 74 )
+		if ( yy_current_state >= 84 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 73);
+	yy_is_jam = (yy_current_state == 83);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2058,7 +2118,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 126 "Trab.l"
+#line 152 "Trab.l"
 
 /*------User subrotines--------*/
 
@@ -2073,12 +2133,13 @@ unsigned int hash(const char *str) {
     return h % TAM_TABELA;
 }
 
-Simbolo* buscarOuInserirSimbolo(const char *lexema, int token) {
+Simbolo* buscarOuInserirSimbolo(const char *lexema) {
     unsigned int indice = hash(lexema);
     Simbolo *atual = tabela[indice];
 
     while (atual != NULL) {
         if (strcmp(atual->lexema, lexema) == 0) {
+            atual->ocorrencias++;
             return atual;
         }
         atual = atual->prox;
@@ -2086,26 +2147,32 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema, int token) {
 
     Simbolo *novo = malloc(sizeof(Simbolo));
     strcpy(novo->lexema, lexema);
-    novo->token = token;
+    novo->token = IDENTIFICADOR;
+    novo->ocorrencias = 1;
     novo->prox = tabela[indice];
     tabela[indice] = novo;
 	return novo;
 }
 
 void imprimirTabela() {
-	printf("\n\nTabela de Símbolos");
-    printf("\n%-6s %-20s %-10s\n", "HASH", "LEXEMA", "TOKEN");
-    printf("--------------------------------------\n");
+    printf("\n\nTabela de Símbolos");
+    printf("\n%-6s %-20s %-10s %-12s\n", "HASH", "LEXEMA", "TOKEN", "QUANT. OCORRENCIAS");
+    printf("-------------------------------------------------------------\n");
 
     for (int i = 0; i < TAM_TABELA; i++) {
         Simbolo *atual = tabela[i];
 
         while (atual != NULL) {
-            printf("%-6d %-20s %-10d\n", i, atual->lexema, atual->token);
+            printf("%-6d %-20s %-10d %-12d\n",
+                   i,
+                   atual->lexema,
+                   atual->token,
+                   atual->ocorrencias);
             atual = atual->prox;
         }
     }
-	printf("--------------------------------------\n");
+
+    printf("-------------------------------------------------------------\n");
 }
 
 
