@@ -2,6 +2,7 @@
 fechado corretamente */
 // Comentário de uma linha
 
+
 int $x = 10;
 float $y = 25.5;
 bool $flag = true;
