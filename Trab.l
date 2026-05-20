@@ -11,6 +11,7 @@ int column_number = 1;
 #define TAM_TABELA 101
 
 typedef struct Simbolo {
+    int id;
     char lexema[100];
     int token;
     int ocorrencias;
@@ -144,9 +145,9 @@ invalido			    .
 {erroZeroInteiro}       { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: o valor zero não pode ser negativo"); column_number += yyleng; }
 {erroZeroEsquerda}      { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: 0 a esquerda"); column_number += yyleng; }
 {erroFloatNegativo}     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: pontos flutuantes não podem assumir valores negativos"); column_number += yyleng; }
-{numeroInteiro}			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO INTEIRO"); column_number += yyleng; yylval.inteiro = atoi(yytext); return NUMERO_INT; }
-{numeroFloat}           { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO FLOAT"); column_number += yyleng; yylval.pontoFlutante = atof(yytext); return NUMERO_FLOAT; }
-{identificador}			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "IDENTIFICADOR"); column_number += yyleng; yylval.simbolo = buscarOuInserirSimbolo(yytext); return IDENTIFICADOR; }
+{numeroInteiro}			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO_INTEIRO"); column_number += yyleng; yylval.inteiro = atoi(yytext); return NUMERO_INT; }
+{numeroFloat}           { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO_FLOAT"); column_number += yyleng; yylval.pontoFlutante = atof(yytext); return NUMERO_FLOAT; }
+{identificador}         { yylval.simbolo = buscarOuInserirSimbolo(yytext); char token_id[25]; sprintf(token_id, "IDENTIFICADOR_%d", yylval.simbolo->id); fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, token_id); column_number += yyleng; return IDENTIFICADOR; }
 {delim}					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; yylval.caractere = yytext[0]; return DELIMITADOR; }
 {literal}				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "LITERAL"); column_number += yyleng; return LITERAL; }
 {quebraLinha}			{ column_number = 1; }
@@ -157,6 +158,8 @@ invalido			    .
 {invalido}				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: caractere inválido"); column_number += yyleng; }
 %%
 /*------User subrotines--------*/
+
+static int proximo_id = 1;
 
 unsigned int hash(const char *str) {
     unsigned int h = 0;
@@ -182,6 +185,7 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema) {
     }
 
     Simbolo *novo = malloc(sizeof(Simbolo));
+    novo->id = proximo_id++;
     strcpy(novo->lexema, lexema);
     novo->token = IDENTIFICADOR;
     novo->ocorrencias = 1;
@@ -192,14 +196,15 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema) {
 
 void imprimirTabela() {
     printf("\n\nTabela de Símbolos");
-    printf("\n%-6s %-20s %-10s %-12s\n", "HASH", "LEXEMA", "TOKEN", "QUANT. OCORRENCIAS");
-    printf("-------------------------------------------------------------\n");
+    printf("\n%-4s %-6s %-20s %-10s %-12s\n", "ID", "HASH", "LEXEMA", "TOKEN", "QUANT. OCORRENCIAS");
+    printf("-----------------------------------------------------------------\n");
 
     for (int i = 0; i < TAM_TABELA; i++) {
         Simbolo *atual = tabela[i];
 
         while (atual != NULL) {
-            printf("%-6d %-20s %-10d %-12d\n",
+            printf("%-4d %-6d %-20s %-10d %-12d\n",
+                   atual->id,
                    i,
                    atual->lexema,
                    atual->token,
@@ -208,7 +213,7 @@ void imprimirTabela() {
         }
     }
 
-    printf("-------------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------\n");
 }
 
 

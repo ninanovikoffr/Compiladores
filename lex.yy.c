@@ -550,6 +550,7 @@ int column_number = 1;
 #define TAM_TABELA 101
 
 typedef struct Simbolo {
+    int id;
     char lexema[100];
     int token;
     int ocorrencias;
@@ -577,9 +578,9 @@ TYPE yylval;
 #define OPERADOR_RELACIONAL 	12
 #define OPERADOR_ARITMETICO		13
 #define OPERADOR_LOGICO    		14
-#define TIPO_DADO				16
-#define NUMERO_INT				17
-#define NUMERO_FLOAT			15
+#define TIPO_DADO				15
+#define NUMERO_INT				16
+#define NUMERO_FLOAT			17
 #define IDENTIFICADOR			18
 
 //Tipos de dados
@@ -620,8 +621,8 @@ TYPE yylval;
 #define OPERADOR_ATRIBUICAO     71
 
 
-#line 624 "lex.yy.c"
 #line 625 "lex.yy.c"
+#line 626 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -838,14 +839,14 @@ YY_DECL
 		}
 
 	{
-#line 104 "Trab.l"
+#line 105 "Trab.l"
 
 
-#line 107 "Trab.l"
+#line 108 "Trab.l"
 /*------Rules--------*/
 
 
-#line 849 "lex.yy.c"
+#line 850 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -914,223 +915,223 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 110 "Trab.l"
+#line 111 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_LT; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 111 "Trab.l"
+#line 112 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_GT; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 112 "Trab.l"
+#line 113 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_EQ; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 113 "Trab.l"
+#line 114 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_LE; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 114 "Trab.l"
+#line 115 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_GE; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 115 "Trab.l"
+#line 116 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_NE; return OPERADOR_RELACIONAL; }
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 117 "Trab.l"
+#line 118 "Trab.l"
 { column_number += yyleng; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 118 "Trab.l"
+#line 119 "Trab.l"
 { column_number += yyleng; }
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 119 "Trab.l"
+#line 120 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: comentários de múltiplas linhas devem ser fechados com \"*/\""); column_number += yyleng; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 121 "Trab.l"
+#line 122 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_PLUS; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 122 "Trab.l"
+#line 123 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_MINUS; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 123 "Trab.l"
+#line 124 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_MULT; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 124 "Trab.l"
+#line 125 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_DIV; return OPERADOR_ARITMETICO; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 126 "Trab.l"
+#line 127 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_AND; return OPERADOR_LOGICO; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 127 "Trab.l"
+#line 128 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_OR; return OPERADOR_LOGICO; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 128 "Trab.l"
+#line 129 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_NOT; return OPERADOR_LOGICO; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 130 "Trab.l"
+#line 131 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_IF; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 131 "Trab.l"
+#line 132 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_ELSE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 132 "Trab.l"
+#line 133 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_WHILE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 133 "Trab.l"
+#line 134 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_PRINT; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 134 "Trab.l"
+#line 135 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_READ; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 135 "Trab.l"
+#line 136 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_RETURN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 136 "Trab.l"
+#line 137 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_TRUE; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 137 "Trab.l"
+#line 138 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_FALSE; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 139 "Trab.l"
+#line 140 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_INTEGER; return TIPO_DADO; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 140 "Trab.l"
+#line 141 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_FLOAT; return TIPO_DADO; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 141 "Trab.l"
+#line 142 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_BOOL; return TIPO_DADO; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 143 "Trab.l"
+#line 144 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ATRIBUICAO"); column_number += yyleng; return OPERADOR_ATRIBUICAO; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 145 "Trab.l"
+#line 146 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: o valor zero não pode ser negativo"); column_number += yyleng; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 146 "Trab.l"
+#line 147 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: 0 a esquerda"); column_number += yyleng; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 147 "Trab.l"
+#line 148 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: pontos flutuantes não podem assumir valores negativos"); column_number += yyleng; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 148 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO INTEIRO"); column_number += yyleng; yylval.inteiro = atoi(yytext); return NUMERO_INT; }
+#line 149 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO_INTEIRO"); column_number += yyleng; yylval.inteiro = atoi(yytext); return NUMERO_INT; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 149 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO FLOAT"); column_number += yyleng; yylval.pontoFlutante = atof(yytext); return NUMERO_FLOAT; }
+#line 150 "Trab.l"
+{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO_FLOAT"); column_number += yyleng; yylval.pontoFlutante = atof(yytext); return NUMERO_FLOAT; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 150 "Trab.l"
-{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "IDENTIFICADOR"); column_number += yyleng; yylval.simbolo = buscarOuInserirSimbolo(yytext); return IDENTIFICADOR; }
+#line 151 "Trab.l"
+{ yylval.simbolo = buscarOuInserirSimbolo(yytext); char token_id[25]; sprintf(token_id, "IDENTIFICADOR_%d", yylval.simbolo->id); fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, token_id); column_number += yyleng; return IDENTIFICADOR; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 151 "Trab.l"
+#line 152 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; yylval.caractere = yytext[0]; return DELIMITADOR; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 152 "Trab.l"
+#line 153 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "LITERAL"); column_number += yyleng; return LITERAL; }
 	YY_BREAK
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 153 "Trab.l"
+#line 154 "Trab.l"
 { column_number = 1; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 154 "Trab.l"
+#line 155 "Trab.l"
 { column_number += yyleng; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 155 "Trab.l"
+#line 156 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: literais devem ser fechados com aspas"); column_number += yyleng; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 156 "Trab.l"
+#line 157 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: pontos flutuantes devem usar \".\" e não \",\""); column_number += yyleng; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 157 "Trab.l"
+#line 158 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: identificadores devem começar com \"$\""); column_number += yyleng; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 158 "Trab.l"
+#line 159 "Trab.l"
 { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: caractere inválido"); column_number += yyleng; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 159 "Trab.l"
+#line 160 "Trab.l"
 ECHO;
 	YY_BREAK
-#line 1134 "lex.yy.c"
+#line 1135 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2147,9 +2148,11 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 159 "Trab.l"
+#line 160 "Trab.l"
 
 /*------User subrotines--------*/
+
+static int proximo_id = 1;
 
 unsigned int hash(const char *str) {
     unsigned int h = 0;
@@ -2175,6 +2178,7 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema) {
     }
 
     Simbolo *novo = malloc(sizeof(Simbolo));
+    novo->id = proximo_id++;
     strcpy(novo->lexema, lexema);
     novo->token = IDENTIFICADOR;
     novo->ocorrencias = 1;
@@ -2185,14 +2189,15 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema) {
 
 void imprimirTabela() {
     printf("\n\nTabela de Símbolos");
-    printf("\n%-6s %-20s %-10s %-12s\n", "HASH", "LEXEMA", "TOKEN", "QUANT. OCORRENCIAS");
+    printf("\n%-4s %-6s %-20s %-10s %-12s\n", "ID", "HASH", "LEXEMA", "TOKEN", "QUANT. OCORRENCIAS");
     printf("-------------------------------------------------------------\n");
 
     for (int i = 0; i < TAM_TABELA; i++) {
         Simbolo *atual = tabela[i];
 
         while (atual != NULL) {
-            printf("%-6d %-20s %-10d %-12d\n",
+            printf("%-4d %-6d %-20s %-10d %-12d\n",
+                   atual->id,
                    i,
                    atual->lexema,
                    atual->token,
