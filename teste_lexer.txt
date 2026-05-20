@@ -5,14 +5,11 @@ fechado corretamente */
 
 int $x = 10;
 float $y = 25.5;
-bool $flag = true;
-bool $flag2 = false;
 
 $x = $x + 1;
 $y = $y / 2.0;
-$flag = ! $flag;
 
-if ($x < 20 && $flag == true) {
+if ($x < 20) {
     print("texto literal fechado");
 }
 else {

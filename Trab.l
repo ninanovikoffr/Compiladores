@@ -38,9 +38,9 @@ TYPE yylval;
 #define OPERADOR_RELACIONAL 	12
 #define OPERADOR_ARITMETICO		13
 #define OPERADOR_LOGICO    		14
-#define TIPO_DADO				16
-#define NUMERO_INT				17
-#define NUMERO_FLOAT			15
+#define TIPO_DADO				15
+#define NUMERO_INT				16
+#define NUMERO_FLOAT			17
 #define IDENTIFICADOR			18
 
 //Tipos de dados
