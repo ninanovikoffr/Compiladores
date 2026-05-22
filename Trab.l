@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parser.h"
 
 int column_number = 1;
 
@@ -23,15 +24,6 @@ unsigned int hash(const char *str);
 Simbolo* buscarOuInserirSimbolo(const char *lexema);
 void imprimirTabela();
 
-typedef union {
-    int inteiro;
-    float pontoFlutante;
-    char *texto;
-    char caractere;
-    Simbolo *simbolo;
-} TYPE;
-
-TYPE yylval;
 
 //Tokens
 #define LITERAL                 10
