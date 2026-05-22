@@ -11,72 +11,13 @@ int column_number = 1;
 
 #define TAM_TABELA 101
 
-typedef struct Simbolo {
-    int id;
-    char lexema[100];
-    int token;
-    int ocorrencias;
-    struct Simbolo *prox;
-} Simbolo;
-
 Simbolo *tabela[TAM_TABELA];
 unsigned int hash(const char *str);
 Simbolo* buscarOuInserirSimbolo(const char *lexema);
 void imprimirTabela();
 
-
-//Tokens
-#define LITERAL                 10
-#define DELIMITADOR				11
-#define OPERADOR_RELACIONAL 	12
-#define OPERADOR_ARITMETICO		13
-#define OPERADOR_LOGICO    		14
-#define TIPO_DADO				15
-#define NUMERO_INT				16
-#define NUMERO_FLOAT			17
-#define IDENTIFICADOR			18
-
-//Tipos de dados
-#define TD_INTEGER  	        21
-#define TD_FLOAT		        22
-#define TD_BOOL                 23
-
-//Palavras reservadas
-#define PR_IF			        31
-#define PR_ELSE			        32
-#define PR_WHILE		        33
-#define PR_PRINT		        34
-#define PR_READ			        35
-#define PR_RETURN               36
-#define PR_TRUE                 37
-#define PR_FALSE                38
-
-//Operadores lógicos
-#define OL_AND			        41
-#define OL_OR			        42
-#define OL_NOT			        43
-
-//Operadores aritméticos
-#define OA_PLUS			        51
-#define OA_MINUS		        52
-#define OA_MULT		            53
-#define OA_DIV                  54
-
-//Operadores relacionais
-#define OR_LT			        61
-#define OR_GT			        62
-#define OR_EQ			        63
-#define OR_LE			        64
-#define OR_GE			        65
-#define OR_NE			        66
-
-//Operador de atribuição
-#define OPERADOR_ATRIBUICAO     71
-
-
 %}
 
-delim				    [;,(){}]
 identificador		    "$"[a-zA-Z0-9]+
 erroZeroInteiro         "-0"
 erroZeroEsquerda        -?0[0-9]+
@@ -99,49 +40,56 @@ invalido			    .
 /*------Rules--------*/
 %}
 
-"<"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_LT; return OPERADOR_RELACIONAL; }
-">"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_GT; return OPERADOR_RELACIONAL; }
-"=="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_EQ; return OPERADOR_RELACIONAL; }
-"<="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_LE; return OPERADOR_RELACIONAL; }
-">="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_GE; return OPERADOR_RELACIONAL; }
-"!="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_RELACIONAL"); column_number += yyleng; yylval.inteiro = OR_NE; return OPERADOR_RELACIONAL; }
+"<"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OR_LT"); column_number += yyleng; return OR_LT; }
+">"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OR_GT"); column_number += yyleng; return OR_GT; }
+"=="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OR_EQ"); column_number += yyleng; return OR_EQ; }
+"<="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OR_LE"); column_number += yyleng; return OR_LE; }
+">="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OR_GE"); column_number += yyleng; return OR_GE; }
+"!="					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OR_NE"); column_number += yyleng; return OR_NE; }
 
 {comentarioPlus}		{ column_number += yyleng; }
 {comentario}			{ column_number += yyleng; }
 {erroComentarioPlus}	{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: comentários de múltiplas linhas devem ser fechados com \"*/\""); column_number += yyleng; }
 
-"+"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_PLUS; return OPERADOR_ARITMETICO; }
-"-"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_MINUS; return OPERADOR_ARITMETICO; }
-"*"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_MULT; return OPERADOR_ARITMETICO; }
-"/"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ARITMETICO"); column_number += yyleng; yylval.inteiro = OA_DIV; return OPERADOR_ARITMETICO; }
+"+"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_PLUS"); column_number += yyleng; return OA_PLUS; }
+"-"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_MINUS"); column_number += yyleng; return OA_MINUS; }
+"*"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_MULT"); column_number += yyleng; return OA_MULT; }
+"/"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_DIV"); column_number += yyleng; return OA_DIV; }
 
-"&&"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_AND; return OPERADOR_LOGICO; }
-"||"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_OR; return OPERADOR_LOGICO; }
-"!"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_LOGICO"); column_number += yyleng; yylval.inteiro = OL_NOT; return OPERADOR_LOGICO; }
+"&&"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OL_AND"); column_number += yyleng; return OL_AND; }
+"||"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OL_OR"); column_number += yyleng; return OL_OR; }
+"!"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OL_NOT"); column_number += yyleng; return OL_NOT; }
 
-"if"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_IF; }
-"else"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_ELSE; }
-"while"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_WHILE; }
-"print"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_PRINT; }
-"read"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_READ; }
-"return"				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_RETURN; }
-"true"		    		{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_TRUE; }
-"false"	    			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PALAVRA_RESERVADA"); column_number += yyleng; return PR_FALSE; }
+"if"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_IF"); column_number += yyleng; return PR_IF; }
+"else"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_ELSE"); column_number += yyleng; return PR_ELSE; }
+"while"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_WHILE"); column_number += yyleng; return PR_WHILE; }
+"print"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_PRINT"); column_number += yyleng; return PR_PRINT; }
+"read"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_READ"); column_number += yyleng; return PR_READ; }
+"return"				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_RETURN"); column_number += yyleng; return PR_RETURN; }
+"true"		    		{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_TRUE"); column_number += yyleng; return PR_TRUE; }
+"false"	    			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_FALSE"); column_number += yyleng; return PR_FALSE; }
 
-"int"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_INTEGER; return TIPO_DADO; }
-"float"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_FLOAT; return TIPO_DADO; }
-"bool"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TIPO_DADO"); column_number += yyleng; yylval.inteiro = TD_BOOL; return TIPO_DADO; }
+"int"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TD_INTEGER"); column_number += yyleng; return TD_INTEGER; }
+"float"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TD_FLOAT"); column_number += yyleng; return TD_FLOAT; }
+"bool"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TD_BOOL"); column_number += yyleng; return TD_BOOL; }
 
-"="                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OPERADOR_ATRIBUICAO"); column_number += yyleng; return OPERADOR_ATRIBUICAO; }
+"="                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OP_ATRIBUICAO"); column_number += yyleng; return OP_ATRIBUICAO; }
 
 {erroZeroInteiro}       { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: o valor zero não pode ser negativo"); column_number += yyleng; }
 {erroZeroEsquerda}      { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: 0 a esquerda"); column_number += yyleng; }
 {erroFloatNegativo}     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: pontos flutuantes não podem assumir valores negativos"); column_number += yyleng; }
 {numeroInteiro}			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO_INTEIRO"); column_number += yyleng; yylval.inteiro = atoi(yytext); return NUMERO_INT; }
 {numeroFloat}           { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "NUMERO_FLOAT"); column_number += yyleng; yylval.pontoFlutante = atof(yytext); return NUMERO_FLOAT; }
-{identificador}         { yylval.simbolo = buscarOuInserirSimbolo(yytext); char token_id[25]; sprintf(token_id, "IDENTIFICADOR_%d", yylval.simbolo->id); fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, token_id); column_number += yyleng; return IDENTIFICADOR; }
-{delim}					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; yylval.caractere = yytext[0]; return DELIMITADOR; }
-{literal}				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "LITERAL"); column_number += yyleng; return LITERAL; }
+{identificador}         { yylval.simbolo = buscarOuInserirSimbolo(yytext); char token_id[25]; sprintf(token_id, "ID_%d", yylval.simbolo->id); fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, token_id); column_number += yyleng; return ID; }
+
+";"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return ';'; }
+","                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return ','; }
+"("                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return '('; }
+")"                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return ')'; }
+"{"                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return '{'; }
+"}"                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "DELIMITADOR"); column_number += yyleng; return '}'; }
+
+{literal}				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "LITERAL"); yylval.texto = strdup(yytext); column_number += yyleng; return LITERAL; }
 {quebraLinha}			{ column_number = 1; }
 {ws}					{ column_number += yyleng; }
 {erroLiteralAberto}		{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "Erro léxico: literais devem ser fechados com aspas"); column_number += yyleng; }
@@ -179,8 +127,9 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema) {
     Simbolo *novo = malloc(sizeof(Simbolo));
     novo->id = proximo_id++;
     strcpy(novo->lexema, lexema);
-    novo->token = IDENTIFICADOR;
+    novo->token = ID;
     novo->ocorrencias = 1;
+    novo->tipo = 0; // inicializacao
     novo->prox = tabela[indice];
     tabela[indice] = novo;
 	return novo;
@@ -206,20 +155,4 @@ void imprimirTabela() {
     }
 
     printf("-----------------------------------------------------------------\n");
-}
-
-
-int main(int argc, char *argv[]){
-	yyin = fopen(argv[1], "r");
-	yyout= stdout;
-
-	fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
-	fprintf(yyout, "-------------------------------------------------------------\n");
-
-	while (yylex() !=0){}
-
-	imprimirTabela();
-
-	fclose(yyin);
-	return 0;
 }

@@ -5,6 +5,8 @@
 
 int yylex(void);
 void yyerror(const char *s);
+
+int tipo_atual = 0;
 %}
 
 %code requires {
@@ -13,6 +15,7 @@ void yyerror(const char *s);
         char lexema[100];
         int token;
         int ocorrencias;
+        int tipo;
         struct Simbolo *prox;
     } Simbolo;
 }
@@ -25,10 +28,25 @@ void yyerror(const char *s);
     Simbolo *simbolo;
 }
 
-%token <simbolo> IDENTIFICADOR
+%type <inteiro> tipo_dado
+
+%token <simbolo> ID
 %token <inteiro> NUMERO_INT
 %token <pontoFlutante> NUMERO_FLOAT
 %token <texto> LITERAL
+
+%token TD_INTEGER TD_FLOAT TD_BOOL
+
+%token PR_IF PR_ELSE PR_WHILE
+%token PR_PRINT PR_READ PR_RETURN
+%token PR_TRUE PR_FALSE
+
+%token OA_PLUS OA_MINUS OA_MULT OA_DIV
+%token OR_LT OR_GT OR_EQ OR_LE OR_GE OR_NE
+%token OL_AND OL_OR OL_NOT
+%token OP_ATRIBUICAO
+
+%start S
 
 %%
 
@@ -42,33 +60,32 @@ elementos:
 ;
 
 elemento:
-    declaracao_variavel
     | declaracao_funcao
     | comando
 ;
 
 tipo_dado:
-    INT
-    | FLOAT
-    | BOOL
+    TD_INTEGER { $$ = TD_INTEGER; }
+    | TD_FLOAT { $$ = TD_FLOAT; }
+    | TD_BOOL  { $$ = TD_BOOL; }
 ;
 
 declaracao_variavel:
-    tipo_dado lista_declaracao_variavel ';'
+    tipo_dado lista_declaracao_variavel ';'         { tipo_atual = $1; }
 ;
 
 lista_declaracao_variavel:
-    lista_declaracao_variavel ',' item_declaracao_variavel
+    lista_declaracao_variavel ',' item_declaracao_variavel 
     | item_declaracao_variavel
 ;
 
 item_declaracao_variavel:
-    ID
-    | ID '=' expressao
+    ID                                              { $1->tipo = tipo_atual; }
+    | ID OP_ATRIBUICAO expressao                    { $1->tipo = tipo_atual; }
 ;
 
 atribuicao:
-    ID '=' expressao
+    ID OP_ATRIBUICAO expressao
 ;
 
 declaracao_funcao:
@@ -126,7 +143,6 @@ comando:
     | comando_saida
     | comando_entrada
     | comando_retorno
-    | chamada_funcao ';'
 ;
 
 comando_sem_if:
@@ -137,7 +153,7 @@ comando_sem_if:
     | comando_saida
     | comando_entrada
     | comando_retorno
-    | chamada_funcao ';'
+;
 
 comando_condicional:
     matched_if
@@ -145,30 +161,30 @@ comando_condicional:
 ;  
 
 matched_if:
-    IF '(' expressao ')' '{'matched_if '}' ELSE '{' matched_if '}'
+    PR_IF '(' expressao ')' '{'matched_if '}' PR_ELSE '{' matched_if '}'
     | '{' comando_sem_if '}'
 ;
 
 open_if:
-    IF '(' expressao ')' '{' comando_condicional '}'
-    | IF '(' expressao ')' '{' matched_if '}' ELSE '{' open_if '}'
+    PR_IF '(' expressao ')' '{' comando_condicional '}'
+    | PR_IF '(' expressao ')' '{' matched_if '}' PR_ELSE '{' open_if '}'
 ;
 
 comando_repeticao:
-    WHILE '(' expressao ')' '{' comandos '}'
+    PR_WHILE '(' expressao ')' '{' comandos '}'
 ;
 
 comando_saida:
-    PRINT '(' expressao ')' ';'
+    PR_PRINT '(' expressao ')' ';'
 ;
 
 comando_entrada:
-    READ '(' ID ')' ';' //verificar se so id
+    PR_READ '(' ID ')' ';' //verificar se so id
 ; 
 
 comando_retorno:
-    RETURN expressao ';'
-    | RETURN ';'
+    PR_RETURN expressao ';'
+    | PR_RETURN ';'
 ;
 
 expressao:
@@ -176,17 +192,17 @@ expressao:
 ;
 
 expressao_ou:
-    expressao_ou OR expressao_e
+    expressao_ou OL_OR expressao_e
     | expressao_e
 ;
 
 expressao_e:
-    expressao_e AND expressao_not
+    expressao_e OL_AND expressao_not
     | expressao_not
 ;
 
 expressao_not:
-    NOT expressao_relacional
+    OL_NOT expressao_relacional
     | expressao_relacional
 ;
 
@@ -220,8 +236,9 @@ expressao_fator:
     '(' expressao ')'
     | chamada_funcao
     | ID
-    | NUM_INT
-    | NUM_FLOAT
+    | NUMERO_INT
+    | NUMERO_FLOAT
+    | LITERAL
     | PR_TRUE
     | PR_FALSE
     | OA_MINUS expressao_fator
@@ -231,9 +248,34 @@ expressao_fator:
 
 %%
 
-int main() {
+extern FILE *yyin;
+extern FILE *yyout;
+
+void imprimirTabela(void);
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        fprintf(stderr, "Uso: %s arquivo_entrada\n", argv[0]); //verificar
+        return 1;
+    }
+
+    yyin = fopen(argv[1], "r");
+    if (yyin == NULL) {
+        fprintf(stderr, "Erro ao abrir o arquivo: %s\n", argv[1]);
+        return 1;
+    }
+
+    yyout = stdout;
+
+    fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
+    fprintf(yyout, "-------------------------------------------------------------\n");
+
     yyparse();
-    // entrada e saida padrões (terminal)
+
+    imprimirTabela();
+
+    fclose(yyin);
+
     return 0;
 }
 
