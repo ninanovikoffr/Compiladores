@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 12 "Trab.y"
+#line 18 "Trab.y"
 
     typedef struct Simbolo {
         int id;
@@ -67,35 +67,35 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    ID = 258,                      /* ID  */
-    NUMERO_INT = 259,              /* NUMERO_INT  */
-    NUMERO_FLOAT = 260,            /* NUMERO_FLOAT  */
-    LITERAL = 261,                 /* LITERAL  */
-    TD_INTEGER = 262,              /* TD_INTEGER  */
-    TD_FLOAT = 263,                /* TD_FLOAT  */
-    TD_BOOL = 264,                 /* TD_BOOL  */
-    PR_IF = 265,                   /* PR_IF  */
-    PR_ELSE = 266,                 /* PR_ELSE  */
-    PR_WHILE = 267,                /* PR_WHILE  */
-    PR_PRINT = 268,                /* PR_PRINT  */
-    PR_READ = 269,                 /* PR_READ  */
-    PR_RETURN = 270,               /* PR_RETURN  */
-    PR_TRUE = 271,                 /* PR_TRUE  */
-    PR_FALSE = 272,                /* PR_FALSE  */
-    OA_PLUS = 273,                 /* OA_PLUS  */
-    OA_MINUS = 274,                /* OA_MINUS  */
-    OA_MULT = 275,                 /* OA_MULT  */
-    OA_DIV = 276,                  /* OA_DIV  */
-    OR_LT = 277,                   /* OR_LT  */
-    OR_GT = 278,                   /* OR_GT  */
-    OR_EQ = 279,                   /* OR_EQ  */
-    OR_LE = 280,                   /* OR_LE  */
-    OR_GE = 281,                   /* OR_GE  */
-    OR_NE = 282,                   /* OR_NE  */
-    OL_AND = 283,                  /* OL_AND  */
-    OL_OR = 284,                   /* OL_OR  */
-    OL_NOT = 285,                  /* OL_NOT  */
-    OP_ATRIBUICAO = 286            /* OP_ATRIBUICAO  */
+    ID = 258,                      /* "identificador"  */
+    NUMERO_INT = 259,              /* "numero inteiro"  */
+    NUMERO_FLOAT = 260,            /* "numero float"  */
+    LITERAL = 261,                 /* "literal"  */
+    TD_INTEGER = 262,              /* "int"  */
+    TD_FLOAT = 263,                /* "float"  */
+    TD_BOOL = 264,                 /* "bool"  */
+    PR_IF = 265,                   /* "if"  */
+    PR_ELSE = 266,                 /* "else"  */
+    PR_WHILE = 267,                /* "while"  */
+    PR_PRINT = 268,                /* "print"  */
+    PR_READ = 269,                 /* "read"  */
+    PR_RETURN = 270,               /* "return"  */
+    PR_TRUE = 271,                 /* "true"  */
+    PR_FALSE = 272,                /* "false"  */
+    OA_PLUS = 273,                 /* "+"  */
+    OA_MINUS = 274,                /* "-"  */
+    OA_MULT = 275,                 /* "*"  */
+    OA_DIV = 276,                  /* "/"  */
+    OR_LT = 277,                   /* "<"  */
+    OR_GT = 278,                   /* ">"  */
+    OR_EQ = 279,                   /* "=="  */
+    OR_LE = 280,                   /* "<="  */
+    OR_GE = 281,                   /* ">="  */
+    OR_NE = 282,                   /* "!="  */
+    OL_AND = 283,                  /* "&&"  */
+    OL_OR = 284,                   /* "||"  */
+    OL_NOT = 285,                  /* "!"  */
+    OP_ATRIBUICAO = 286            /* "="  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -104,7 +104,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 "Trab.y"
+#line 29 "Trab.y"
 
     int inteiro;
     float pontoFlutante;

@@ -2,11 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 int yylex(void);
 void yyerror(const char *s);
 
 int tipo_atual = 0;
+int sintatic_error_count = 0;
+char g_analysis_trace[10000] = "[Lin:Col]\tACAO\tDETALHE\n";
+
+extern int yylineno;
+extern int column_number;
 %}
 
 %code requires {
@@ -28,21 +34,42 @@ int tipo_atual = 0;
     Simbolo *simbolo;
 }
 
-%token <simbolo> ID
-%token <inteiro> NUMERO_INT
-%token <pontoFlutante> NUMERO_FLOAT
-%token <texto> LITERAL
+/* Habilita mensagens de erro detalhadas (mostrando o que era esperado) */
+%define parse.error verbose
 
-%token TD_INTEGER TD_FLOAT TD_BOOL
+/* Associação dos tokens a versões legíveis em português (aliases) */
+%token <simbolo> ID "identificador"
+%token <inteiro> NUMERO_INT "numero inteiro"
+%token <pontoFlutante> NUMERO_FLOAT "numero float"
+%token <texto> LITERAL "literal"
 
-%token PR_IF PR_ELSE PR_WHILE
-%token PR_PRINT PR_READ PR_RETURN
-%token PR_TRUE PR_FALSE
+%token TD_INTEGER "int"
+%token TD_FLOAT "float"
+%token TD_BOOL "bool"
 
-%token OA_PLUS OA_MINUS OA_MULT OA_DIV
-%token OR_LT OR_GT OR_EQ OR_LE OR_GE OR_NE
-%token OL_AND OL_OR OL_NOT
-%token OP_ATRIBUICAO
+%token PR_IF "if"
+%token PR_ELSE "else"
+%token PR_WHILE "while"
+%token PR_PRINT "print"
+%token PR_READ "read"
+%token PR_RETURN "return"
+%token PR_TRUE "true"
+%token PR_FALSE "false"
+
+%token OA_PLUS "+"
+%token OA_MINUS "-"
+%token OA_MULT "*"
+%token OA_DIV "/"
+%token OR_LT "<"
+%token OR_GT ">"
+%token OR_EQ "=="
+%token OR_LE "<="
+%token OR_GE ">="
+%token OR_NE "!="
+%token OL_AND "&&"
+%token OL_OR "||"
+%token OL_NOT "!"
+%token OP_ATRIBUICAO "="
 
 %start S
 
@@ -55,7 +82,8 @@ S:
 elementos:
     elementos elemento
     | elemento
-;
+    | error ';' { yyerrok; /* Ignora erro na raiz até encontrar um ponto e vírgula */ }
+; 
 
 elemento:
     declaracao_funcao
@@ -125,6 +153,8 @@ bloco:
 comandos:
     /* vazio */
     | comandos comando
+    | comandos error ';' { yyerrok; /* Recuperação de erro em instruções com ponto e vírgula */ }
+    | comandos error '}' { yyerrok; /* Recuperação de erro em fechamentos de blocos estruturados */ }
 ;
 
 comando:
@@ -147,7 +177,6 @@ comando_fechado:
 matched_if:
     PR_IF '(' expressao ')' comando_fechado PR_ELSE comando_fechado
 ;
-
 
 comando_aberto:
     open_if
@@ -237,8 +266,6 @@ expressao_fator:
     | OA_MINUS expressao_fator
 ;
 
-
-
 %%
 
 extern FILE *yyin;
@@ -246,9 +273,40 @@ extern FILE *yyout;
 
 void imprimirTabela(void);
 
+/* Funcao para imprimir tabela de analise sintatica */
+void print_analysis_table(void) {
+    printf("\n");
+    printf("===================================================================\n");
+    printf("         ANALISE SINTATICA (Shift-Reduce)\n");
+    printf("===================================================================\n");
+    printf("[Lin:Col]\tACAO\tDETALHE\n");
+    printf("-------------------------------------------------------------------\n");
+
+    char* trace_copy = strdup(g_analysis_trace);
+    if (!trace_copy) return;
+
+    char* line = strtok(trace_copy, "\n");
+    line = strtok(NULL, "\n");
+    /* Pula cabecalho */
+
+    while (line != NULL) {
+        printf("%s\n", line);
+        line = strtok(NULL, "\n");
+    }
+
+    free(trace_copy);
+    printf("===================================================================\n");
+    if (sintatic_error_count == 0) {
+        printf("Analise concluida com SUCESSO!\n");
+    } else {
+        printf("Analise concluida com %d erro(s).\n", sintatic_error_count);
+    }
+    printf("===================================================================\n");
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Uso: %s arquivo_entrada\n", argv[0]); //verificar
+        fprintf(stderr, "Uso: %s arquivo_entrada\n", argv[0]);
         return 1;
     }
 
@@ -262,16 +320,57 @@ int main(int argc, char *argv[]) {
 
     fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
     fprintf(yyout, "-------------------------------------------------------------\n");
-
     yyparse();
 
+    print_analysis_table();
     imprimirTabela();
 
     fclose(yyin);
 
-    return 0;
+    return (sintatic_error_count > 0) ? 1 : 0;
 }
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Erro: %s\n", s);
+    char temp_str[1024];
+    char error_msg[1024];
+    
+    strncpy(error_msg, s, sizeof(error_msg) - 1);
+    error_msg[sizeof(error_msg) - 1] = '\0';
+
+    char buffer_pt[1024] = {0};
+    char *p;
+
+    /* Traduz o prefixo padrao do bison verbose limitando o tamanho para o GCC não reclamar */
+    if (strncmp(error_msg, "syntax error, unexpected ", 25) == 0) {
+        snprintf(buffer_pt, sizeof(buffer_pt), "erro sintatico: inesperado %.400s", error_msg + 25);
+    } else if (strncmp(error_msg, "syntax error", 12) == 0) {
+        snprintf(buffer_pt, sizeof(buffer_pt), "erro sintatico%.400s", error_msg + 12);
+    } else {
+        strncpy(buffer_pt, error_msg, sizeof(buffer_pt));
+    }
+
+    /* Traduz a cláusula de tokens esperados */
+    if ((p = strstr(buffer_pt, ", expecting "))) {
+        char prefix[1024] = {0};
+        strncpy(prefix, buffer_pt, p - buffer_pt);
+        /* %.400s garante que nao ultrapasse o limite do buffer */
+        snprintf(error_msg, sizeof(error_msg), "%.400s, esperado %.400s", prefix, p + 12);
+    } else {
+        strncpy(error_msg, buffer_pt, sizeof(error_msg));
+    }
+
+    /* Traduz todas as conjunções de alternância 'or' para 'ou' */
+    while ((p = strstr(error_msg, " or "))) {
+        char prefix[1024] = {0};
+        strncpy(prefix, error_msg, p - error_msg);
+        snprintf(buffer_pt, sizeof(buffer_pt), "%.400s ou %.400s", prefix, p + 4);
+        strncpy(error_msg, buffer_pt, sizeof(error_msg));
+    }
+
+    /* %.800s jura pro compilador que a string de erro nunca estourará o limite global da linha */
+    snprintf(temp_str, sizeof(temp_str), "[%03d:%03d]\tERRO\t%.800s\n", 
+             yylineno, column_number, error_msg);
+             
+    strcat(g_analysis_trace, temp_str);
+    sintatic_error_count++;
 }

@@ -24,7 +24,7 @@ erroZeroEsquerda        -?0[0-9]+
 numeroInteiro		    (-?[0-9]+)
 erroFloatNegativo       -[0-9]+("."[0-9]+)
 numeroFloat             [0-9]+("."[0-9]+)?
-ws					    [ \t]
+ws					    [ \t\r]+
 quebraLinha			    \n
 comentario			    "//".*
 comentarioPlus		    "/*"([^*]*|"*"+[^/*]+)*"*"+"/"

@@ -54,4 +54,58 @@ if ($x == 0)
 /* Comentário de
    múltiplas linhas válido */
 
+// ==========================================
+// BATERIA DE TESTES: ERROS SINTÁTICOS
+// ==========================================
+// Nota: O Lexer vai ler tudo perfeitamente, mas o Bison vai entrar em Pânico.
+
+// 1. Operadores duplicados / Expressão malformada
+// O parser espera um identificador ou número após o '+', mas encontra um '*'.
+$x = $a + * $b;
+
+// 2. Parênteses desbalanceados em expressões
+// Faltou fechar o parêntese antes do ponto e vírgula.
+$y = (2 + 3;
+
+// 3. Estrutura do comando 'if' malformada (faltando parênteses na condição)
+// Na linguagem C/Java, o parêntese em volta da expressão do if é obrigatório.
+if $x > 0
+    print($x);
+
+// 4. Erro em parâmetros de função (faltando vírgula)
+// O parser espera um ',' ou ')' após o primeiro parâmetro, mas encontra 'int'.
+int $funcaoErro(int $param1 int $param2) {
+    return 0;
+}
+
+// 5. Atribuição invertida (L-value inválido)
+// A gramática exige que o lado esquerdo do '=' seja uma variável (ID), não um número.
+5 = $x;
+
+// 6. Faltando a expressão dentro de um comando de repetição
+// Um laço while não pode ter a condição vazia.
+while () {
+    $x = $x + 1;
+}
+
+// 7. Chamada de função com argumentos inválidos (vírgula sobrando)
+// Esperava-se uma expressão entre as vírgulas.
+$y = $soma(2, , 3);
+
+// 8. Uso de palavra reservada no lugar errado
+// 'true' é um valor booleano, não pode ser usado como nome de variável.
+int true = 5;
+
+// 9. Esquecer de abrir a chave num bloco de função
+// O parser espera '{' após a assinatura da função.
+int $outraFuncao(int $n)
+    return $n;
+}
+
+// 10. Esquecer da ',' para declaração de identificadores
+int $a $b = 5; // Erro (esperado ',' ou ';')
+
+// 11. Incusão de um '+' após o identificador 
+read($a+);     // Erro (esperado ')')
+
 print("Fim do teste");
