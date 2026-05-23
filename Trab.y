@@ -60,7 +60,7 @@ elementos:
 ;
 
 elemento:
-    | declaracao_funcao
+    declaracao_funcao
     | comando
 ;
 
@@ -143,35 +143,16 @@ comando:
     | comando_saida
     | comando_entrada
     | comando_retorno
-;
-
-comando_sem_if:
-    atribuicao ';'
-    | declaracao_variavel
-    | chamada_funcao ';'
-    | comando_repeticao
-    | comando_saida
-    | comando_entrada
-    | comando_retorno
+    | bloco
 ;
 
 comando_condicional:
-    matched_if
-    | open_if
-;  
-
-matched_if:
-    PR_IF '(' expressao ')' '{'matched_if '}' PR_ELSE '{' matched_if '}'
-    | '{' comando_sem_if '}'
-;
-
-open_if:
-    PR_IF '(' expressao ')' '{' comando_condicional '}'
-    | PR_IF '(' expressao ')' '{' matched_if '}' PR_ELSE '{' open_if '}'
+    PR_IF '(' expressao ')' bloco
+    | PR_IF '(' expressao ')' bloco PR_ELSE bloco
 ;
 
 comando_repeticao:
-    PR_WHILE '(' expressao ')' '{' comandos '}'
+    PR_WHILE '(' expressao ')' comando
 ;
 
 comando_saida:
