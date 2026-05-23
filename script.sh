@@ -10,4 +10,4 @@ flex -o lexer.c Trab.l
 gcc parser.c lexer.c -lfl -o saida
 
 # Executar com arquivo de teste
-./saida teste.txt
+./saida teste_parser.txt

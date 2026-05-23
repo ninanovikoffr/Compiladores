@@ -28,8 +28,6 @@ int tipo_atual = 0;
     Simbolo *simbolo;
 }
 
-%type <inteiro> tipo_dado
-
 %token <simbolo> ID
 %token <inteiro> NUMERO_INT
 %token <pontoFlutante> NUMERO_FLOAT
@@ -51,7 +49,7 @@ int tipo_atual = 0;
 %%
 
 S:
-    elementos  
+    elementos               { printf("Análise sintática concluída com sucesso.\n"); }
 ; 
 
 elementos:
@@ -65,13 +63,13 @@ elemento:
 ;
 
 tipo_dado:
-    TD_INTEGER { $$ = TD_INTEGER; }
-    | TD_FLOAT { $$ = TD_FLOAT; }
-    | TD_BOOL  { $$ = TD_BOOL; }
+    TD_INTEGER
+    | TD_FLOAT
+    | TD_BOOL
 ;
 
 declaracao_variavel:
-    tipo_dado lista_declaracao_variavel ';'         { tipo_atual = $1; }
+    tipo_dado lista_declaracao_variavel ';'
 ;
 
 lista_declaracao_variavel:
@@ -80,8 +78,8 @@ lista_declaracao_variavel:
 ;
 
 item_declaracao_variavel:
-    ID                                              { $1->tipo = tipo_atual; }
-    | ID OP_ATRIBUICAO expressao                    { $1->tipo = tipo_atual; }
+    ID
+    | ID OP_ATRIBUICAO expressao
 ;
 
 atribuicao:
@@ -125,34 +123,48 @@ bloco:
 ;
 
 comandos:
-    lista_comandos comando
-    | /* vazio */
-;
-
-lista_comandos:
-    lista_comandos comando
-    | comando
+    /* vazio */
+    | comandos comando
 ;
 
 comando:
+    comando_fechado
+    | comando_aberto
+;
+
+comando_fechado:
     atribuicao ';'
     | declaracao_variavel
     | chamada_funcao ';'
-    | comando_condicional
-    | comando_repeticao
+    | bloco
     | comando_saida
     | comando_entrada
     | comando_retorno
-    | bloco
+    | matched_if
+    | comando_repeticao_fechado
 ;
 
-comando_condicional:
-    PR_IF '(' expressao ')' bloco
-    | PR_IF '(' expressao ')' bloco PR_ELSE bloco
+matched_if:
+    PR_IF '(' expressao ')' comando_fechado PR_ELSE comando_fechado
 ;
 
-comando_repeticao:
-    PR_WHILE '(' expressao ')' comando
+
+comando_aberto:
+    open_if
+    | comando_repeticao_aberto
+;
+
+open_if:
+    PR_IF '(' expressao ')' comando
+    | PR_IF '(' expressao ')' comando_fechado PR_ELSE comando_aberto
+;
+
+comando_repeticao_fechado:
+    PR_WHILE '(' expressao ')' comando_fechado
+;
+
+comando_repeticao_aberto:
+    PR_WHILE '(' expressao ')' comando_aberto
 ;
 
 comando_saida:
