@@ -1,6 +1,6 @@
 // Teste válido para o analisador sintático
 
-int $x = 5;
+int $x = -5;
 float $y = 3.14;
 bool $ativo = true;
 
@@ -55,9 +55,9 @@ if ($x == 0)
    múltiplas linhas válido */
 
 // ==========================================
-// BATERIA DE TESTES: ERROS SINTÁTICOS
+// TESTES PARA ERROS SINTÁTICOS
 // ==========================================
-// Nota: O Lexer vai ler tudo perfeitamente, mas o Bison vai entrar em Pânico.
+// Nota: O Lexer vai ler tudo perfeitamente, mas o Bison vai acusar erros.
 
 // 1. Operadores duplicados / Expressão malformada
 // O parser espera um identificador ou número após o '+', mas encontra um '*'.

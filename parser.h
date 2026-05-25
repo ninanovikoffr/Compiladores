@@ -52,11 +52,10 @@ extern int yydebug;
         char lexema[100];
         int token;
         int ocorrencias;
-        int tipo;
         struct Simbolo *prox;
     } Simbolo;
 
-#line 60 "parser.h"
+#line 59 "parser.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -104,7 +103,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 29 "Trab.y"
+#line 28 "Trab.y"
 
     int inteiro;
     float pontoFlutante;
@@ -112,7 +111,7 @@ union YYSTYPE
     char caractere;
     Simbolo *simbolo;
 
-#line 116 "parser.h"
+#line 115 "parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

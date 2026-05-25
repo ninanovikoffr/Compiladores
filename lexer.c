@@ -2148,14 +2148,12 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema) {
     strcpy(novo->lexema, lexema);
     novo->token = ID;
     novo->ocorrencias = 1;
-    novo->tipo = 0; // inicializacao
     novo->prox = tabela[indice];
     tabela[indice] = novo;
 	return novo;
 }
 
 void imprimirTabela() {
-    printf("\n\nTabela de Símbolos");
     printf("\n%-4s %-6s %-20s %-10s %-12s\n", "ID", "HASH", "LEXEMA", "TOKEN", "QUANT. OCORRENCIAS");
     printf("-----------------------------------------------------------------\n");
 
@@ -2163,16 +2161,14 @@ void imprimirTabela() {
         Simbolo *atual = tabela[i];
 
         while (atual != NULL) {
-            printf("%-4d %-6d %-20s %-10d %-12d\n",
+            printf("%-4d %-6d %-20s %-10s %-12d\n",
                    atual->id,
                    i,
                    atual->lexema,
-                   atual->token,
+                   "ID",
                    atual->ocorrencias);
             atual = atual->prox;
         }
     }
-
-    printf("-----------------------------------------------------------------\n");
 }
 

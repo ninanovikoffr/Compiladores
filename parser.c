@@ -575,15 +575,15 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    79,    79,    83,    84,    85,    89,    90,    94,    95,
-      96,   100,   104,   105,   109,   110,   114,   118,   122,   123,
-     127,   128,   132,   136,   140,   141,   145,   146,   150,   153,
-     155,   156,   157,   161,   162,   166,   167,   168,   169,   170,
-     171,   172,   173,   174,   178,   182,   183,   187,   188,   192,
-     196,   200,   204,   208,   209,   213,   217,   218,   222,   223,
-     227,   228,   232,   233,   237,   238,   239,   240,   241,   242,
-     246,   247,   248,   252,   253,   254,   258,   259,   260,   261,
-     262,   263,   264,   265,   266
+       0,    78,    78,    82,    83,    84,    88,    89,    93,    94,
+      95,    99,   103,   104,   108,   109,   113,   117,   121,   122,
+     126,   127,   131,   135,   139,   140,   144,   145,   149,   152,
+     154,   155,   156,   160,   161,   165,   166,   167,   168,   169,
+     170,   171,   172,   173,   177,   181,   182,   186,   187,   191,
+     195,   199,   203,   207,   208,   212,   216,   217,   221,   222,
+     226,   227,   231,   232,   236,   237,   238,   239,   240,   241,
+     245,   246,   247,   251,   252,   253,   257,   258,   259,   260,
+     261,   262,   263,   264,   265
 };
 #endif
 
@@ -1515,32 +1515,26 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* S: elementos  */
-#line 79 "Trab.y"
-                            { printf("Análise sintática concluída com sucesso.\n"); }
+  case 5: /* elementos: error ';'  */
+#line 84 "Trab.y"
+                { yyerrok; /* Ignora erro na raiz até encontrar um ponto e vírgula */ }
 #line 1522 "parser.c"
     break;
 
-  case 5: /* elementos: error ';'  */
-#line 85 "Trab.y"
-                { yyerrok; /* Ignora erro na raiz até encontrar um ponto e vírgula */ }
+  case 31: /* comandos: comandos error ';'  */
+#line 155 "Trab.y"
+                         { yyerrok; /* Recuperação de erro em instruções com ponto e vírgula */ }
 #line 1528 "parser.c"
     break;
 
-  case 31: /* comandos: comandos error ';'  */
+  case 32: /* comandos: comandos error '}'  */
 #line 156 "Trab.y"
-                         { yyerrok; /* Recuperação de erro em instruções com ponto e vírgula */ }
+                         { yyerrok; /* Recuperação de erro em fechamentos de blocos estruturados */ }
 #line 1534 "parser.c"
     break;
 
-  case 32: /* comandos: comandos error '}'  */
-#line 157 "Trab.y"
-                         { yyerrok; /* Recuperação de erro em fechamentos de blocos estruturados */ }
-#line 1540 "parser.c"
-    break;
 
-
-#line 1544 "parser.c"
+#line 1538 "parser.c"
 
       default: break;
     }
@@ -1764,7 +1758,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 269 "Trab.y"
+#line 268 "Trab.y"
 
 
 extern FILE *yyin;
@@ -1773,10 +1767,10 @@ extern FILE *yyout;
 void imprimirTabela(void);
 
 /* Funcao para imprimir tabela de analise sintatica */
-void print_analysis_table(void) {
+void print_analise_sintatica(void) {
     printf("\n");
     printf("===================================================================\n");
-    printf("         ANALISE SINTATICA (Shift-Reduce)\n");
+    printf("                        ANALISE SINTATICA\n");
     printf("===================================================================\n");
     printf("[Lin:Col]\tACAO\tDETALHE\n");
     printf("-------------------------------------------------------------------\n");
@@ -1794,7 +1788,7 @@ void print_analysis_table(void) {
     }
 
     free(trace_copy);
-    printf("===================================================================\n");
+    printf("-------------------------------------------------------------------\n");
     if (sintatic_error_count == 0) {
         printf("Analise concluida com SUCESSO!\n");
     } else {
@@ -1817,15 +1811,24 @@ int main(int argc, char *argv[]) {
 
     yyout = stdout;
 
+    // --- Cabeçalho da análise léxica ---
+    printf("===================================================================\n");
+    printf("                        ANALISE LÉXICA\n");
+    printf("===================================================================\n");
     fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
     fprintf(yyout, "-------------------------------------------------------------\n");
+
+    // Executa o lexer
     yyparse();
 
-    print_analysis_table();
-    imprimirTabela();
+    // --- Imprime a tabela de símbolos após a análise léxica ---
+    fprintf(yyout, "\nTABELA DE SÍMBOLOS\n");
+    fprintf(yyout, "================================================================");
+    imprimirTabela();  // função que percorre a lista de símbolos
+
+    print_analise_sintatica(); // Imprime a tabela de análise sintática
 
     fclose(yyin);
-
     return (sintatic_error_count > 0) ? 1 : 0;
 }
 
@@ -1841,9 +1844,9 @@ void yyerror(const char *s) {
 
     /* Traduz o prefixo padrao do bison verbose limitando o tamanho para o GCC não reclamar */
     if (strncmp(error_msg, "syntax error, unexpected ", 25) == 0) {
-        snprintf(buffer_pt, sizeof(buffer_pt), "erro sintatico: inesperado %.400s", error_msg + 25);
+        snprintf(buffer_pt, sizeof(buffer_pt), "Erro sintatico: inesperado %.400s", error_msg + 25);
     } else if (strncmp(error_msg, "syntax error", 12) == 0) {
-        snprintf(buffer_pt, sizeof(buffer_pt), "erro sintatico%.400s", error_msg + 12);
+        snprintf(buffer_pt, sizeof(buffer_pt), "Erro sintatico%.400s", error_msg + 12);
     } else {
         strncpy(buffer_pt, error_msg, sizeof(buffer_pt));
     }
@@ -1866,7 +1869,7 @@ void yyerror(const char *s) {
         strncpy(error_msg, buffer_pt, sizeof(error_msg));
     }
 
-    /* %.800s jura pro compilador que a string de erro nunca estourará o limite global da linha */
+    /* %.800s garante pro compilador que a string de erro nunca estourará o limite global da linha */
     snprintf(temp_str, sizeof(temp_str), "[%03d:%03d]\tERRO\t%.800s\n", 
              yylineno, column_number, error_msg);
              

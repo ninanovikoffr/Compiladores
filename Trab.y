@@ -21,7 +21,6 @@ extern int column_number;
         char lexema[100];
         int token;
         int ocorrencias;
-        int tipo;
         struct Simbolo *prox;
     } Simbolo;
 }
@@ -76,7 +75,7 @@ extern int column_number;
 %%
 
 S:
-    elementos               { printf("Análise sintática concluída com sucesso.\n"); }
+    elementos
 ; 
 
 elementos:
@@ -274,10 +273,10 @@ extern FILE *yyout;
 void imprimirTabela(void);
 
 /* Funcao para imprimir tabela de analise sintatica */
-void print_analysis_table(void) {
+void print_analise_sintatica(void) {
     printf("\n");
     printf("===================================================================\n");
-    printf("         ANALISE SINTATICA (Shift-Reduce)\n");
+    printf("                        ANALISE SINTATICA\n");
     printf("===================================================================\n");
     printf("[Lin:Col]\tACAO\tDETALHE\n");
     printf("-------------------------------------------------------------------\n");
@@ -295,7 +294,7 @@ void print_analysis_table(void) {
     }
 
     free(trace_copy);
-    printf("===================================================================\n");
+    printf("-------------------------------------------------------------------\n");
     if (sintatic_error_count == 0) {
         printf("Analise concluida com SUCESSO!\n");
     } else {
@@ -318,15 +317,24 @@ int main(int argc, char *argv[]) {
 
     yyout = stdout;
 
+    // --- Cabeçalho da análise léxica ---
+    printf("===================================================================\n");
+    printf("                        ANALISE LÉXICA\n");
+    printf("===================================================================\n");
     fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
     fprintf(yyout, "-------------------------------------------------------------\n");
+
+    // Executa o lexer
     yyparse();
 
-    print_analysis_table();
-    imprimirTabela();
+    // --- Imprime a tabela de símbolos após a análise léxica ---
+    fprintf(yyout, "\nTABELA DE SÍMBOLOS\n");
+    fprintf(yyout, "================================================================");
+    imprimirTabela();  // função que percorre a lista de símbolos
+
+    print_analise_sintatica(); // Imprime a tabela de análise sintática
 
     fclose(yyin);
-
     return (sintatic_error_count > 0) ? 1 : 0;
 }
 
@@ -342,9 +350,9 @@ void yyerror(const char *s) {
 
     /* Traduz o prefixo padrao do bison verbose limitando o tamanho para o GCC não reclamar */
     if (strncmp(error_msg, "syntax error, unexpected ", 25) == 0) {
-        snprintf(buffer_pt, sizeof(buffer_pt), "erro sintatico: inesperado %.400s", error_msg + 25);
+        snprintf(buffer_pt, sizeof(buffer_pt), "Erro sintatico: inesperado %.400s", error_msg + 25);
     } else if (strncmp(error_msg, "syntax error", 12) == 0) {
-        snprintf(buffer_pt, sizeof(buffer_pt), "erro sintatico%.400s", error_msg + 12);
+        snprintf(buffer_pt, sizeof(buffer_pt), "Erro sintatico%.400s", error_msg + 12);
     } else {
         strncpy(buffer_pt, error_msg, sizeof(buffer_pt));
     }
@@ -367,7 +375,7 @@ void yyerror(const char *s) {
         strncpy(error_msg, buffer_pt, sizeof(error_msg));
     }
 
-    /* %.800s jura pro compilador que a string de erro nunca estourará o limite global da linha */
+    /* %.800s garante pro compilador que a string de erro nunca estourará o limite global da linha */
     snprintf(temp_str, sizeof(temp_str), "[%03d:%03d]\tERRO\t%.800s\n", 
              yylineno, column_number, error_msg);
              
