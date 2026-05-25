@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 18 "Trab.y"
+#line 17 "Trab.y"
 
     typedef struct Simbolo {
         int id;
@@ -103,7 +103,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 28 "Trab.y"
+#line 27 "Trab.y"
 
     int inteiro;
     float pontoFlutante;

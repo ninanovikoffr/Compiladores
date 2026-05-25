@@ -77,14 +77,13 @@
 int yylex(void);
 void yyerror(const char *s);
 
-int tipo_atual = 0;
 int sintatic_error_count = 0;
 char g_analysis_trace[10000] = "[Lin:Col]\tACAO\tDETALHE\n";
 
 extern int yylineno;
 extern int column_number;
 
-#line 88 "parser.c"
+#line 87 "parser.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -575,15 +574,15 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    78,    78,    82,    83,    84,    88,    89,    93,    94,
-      95,    99,   103,   104,   108,   109,   113,   117,   121,   122,
-     126,   127,   131,   135,   139,   140,   144,   145,   149,   152,
-     154,   155,   156,   160,   161,   165,   166,   167,   168,   169,
-     170,   171,   172,   173,   177,   181,   182,   186,   187,   191,
-     195,   199,   203,   207,   208,   212,   216,   217,   221,   222,
-     226,   227,   231,   232,   236,   237,   238,   239,   240,   241,
-     245,   246,   247,   251,   252,   253,   257,   258,   259,   260,
-     261,   262,   263,   264,   265
+       0,    77,    77,    81,    82,    83,    87,    88,    92,    93,
+      94,    98,   102,   103,   107,   108,   112,   116,   120,   121,
+     125,   126,   130,   134,   138,   139,   143,   144,   148,   151,
+     153,   154,   155,   159,   160,   164,   165,   166,   167,   168,
+     169,   170,   171,   172,   176,   180,   181,   185,   186,   190,
+     194,   198,   202,   206,   207,   211,   215,   216,   220,   221,
+     225,   226,   230,   231,   235,   236,   237,   238,   239,   240,
+     244,   245,   246,   250,   251,   252,   256,   257,   258,   259,
+     260,   261,   262,   263,   264
 };
 #endif
 
@@ -1516,25 +1515,25 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* elementos: error ';'  */
-#line 84 "Trab.y"
+#line 83 "Trab.y"
                 { yyerrok; /* Ignora erro na raiz até encontrar um ponto e vírgula */ }
-#line 1522 "parser.c"
+#line 1521 "parser.c"
     break;
 
   case 31: /* comandos: comandos error ';'  */
-#line 155 "Trab.y"
+#line 154 "Trab.y"
                          { yyerrok; /* Recuperação de erro em instruções com ponto e vírgula */ }
-#line 1528 "parser.c"
+#line 1527 "parser.c"
     break;
 
   case 32: /* comandos: comandos error '}'  */
-#line 156 "Trab.y"
+#line 155 "Trab.y"
                          { yyerrok; /* Recuperação de erro em fechamentos de blocos estruturados */ }
-#line 1534 "parser.c"
+#line 1533 "parser.c"
     break;
 
 
-#line 1538 "parser.c"
+#line 1537 "parser.c"
 
       default: break;
     }
@@ -1758,7 +1757,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 268 "Trab.y"
+#line 267 "Trab.y"
 
 
 extern FILE *yyin;

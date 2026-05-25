@@ -7,7 +7,6 @@
 int yylex(void);
 void yyerror(const char *s);
 
-int tipo_atual = 0;
 int sintatic_error_count = 0;
 char g_analysis_trace[10000] = "[Lin:Col]\tACAO\tDETALHE\n";
 
@@ -37,10 +36,10 @@ extern int column_number;
 %define parse.error verbose
 
 /* Associação dos tokens a versões legíveis em português (aliases) */
-%token <simbolo> ID "identificador"
-%token <inteiro> NUMERO_INT "numero inteiro"
-%token <pontoFlutante> NUMERO_FLOAT "numero float"
-%token <texto> LITERAL "literal"
+%token ID "identificador"
+%token NUMERO_INT "numero inteiro"
+%token NUMERO_FLOAT "numero float"
+%token LITERAL "literal"
 
 %token TD_INTEGER "int"
 %token TD_FLOAT "float"
