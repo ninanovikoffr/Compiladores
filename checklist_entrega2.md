@@ -46,7 +46,7 @@ int $x = 10;
 ```
 
 - [~] Ajustar `tipo_dado` para retornar valor com `$$`, caso você queira salvar o tipo na tabela.
-- [X] Adicionar campo `tipo` na `struct Simbolo`.
+- [x] Adicionar campo `tipo` na `struct Simbolo`.
 - [~] Salvar o tipo declarado no símbolo correspondente.
 - [ ] Decidir se a tabela de símbolos será apenas léxica ou se já vai armazenar informações básicas da etapa semântica.
 
@@ -183,6 +183,7 @@ comandos:
     | /* vazio */
 ;
 ```
+
 - [ ] Testar bloco vazio:
 
 ```c
@@ -204,7 +205,7 @@ if ($x > 0) {
 PR_READ '(' ID ')' ';'
 ```
 
-- [X] `print` aceita `expressao`, mas falta garantir que `LITERAL` esteja dentro de `expressao_fator`.
+- [x] `print` aceita `expressao`, mas falta garantir que `LITERAL` esteja dentro de `expressao_fator`.
 - [ ] Testar:
 
 ```c
@@ -243,7 +244,7 @@ OA_MINUS expressao_fator
 $x - 1
 ```
 
-  e:
+e:
 
 ```c
 -$x
@@ -283,7 +284,7 @@ print("Olá");
 $nome = "Ana";
 ```
 
-  A compatibilidade de tipo pode ficar para a etapa semântica.
+A compatibilidade de tipo pode ficar para a etapa semântica.
 
 ---
 
@@ -340,7 +341,7 @@ void yyerror(const char *s) {
 int $x
 ```
 
-  sem `;`.
+sem `;`.
 
 - [ ] Testar erro com parêntese faltando.
 - [ ] Testar erro com chave faltando.
@@ -356,7 +357,7 @@ elemento -> declaracao_variavel
 elemento -> comando -> declaracao_variavel
 ```
 
-- [X] Remover `declaracao_variavel` de um dos caminhos.
+- [x] Remover `declaracao_variavel` de um dos caminhos.
 - [ ] Corrigir conflito do `if/else`.
 - [ ] Rodar:
 

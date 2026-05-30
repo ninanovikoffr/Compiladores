@@ -1832,46 +1832,15 @@ int main(int argc, char *argv[]) {
 }
 
 void yyerror(const char *s) {
-    char temp_str[1024];
-    char error_msg[1024];
+    char linha_formatada[1024];
+    char mensagem_erro[1024];
     
-    strncpy(error_msg, s, sizeof(error_msg) - 1);
-    error_msg[sizeof(error_msg) - 1] = '\0';
+    strncpy(mensagem_erro, s, sizeof(mensagem_erro) - 1);
+    mensagem_erro[sizeof(mensagem_erro) - 1] = '\0';
 
-    char buffer_pt[1024] = {0};
-    char *p;
-
-    /* Traduz o prefixo padrao do bison verbose limitando o tamanho para o GCC não reclamar */
-    if (strncmp(error_msg, "syntax error, unexpected ", 25) == 0) {
-        snprintf(buffer_pt, sizeof(buffer_pt), "Erro sintatico: inesperado %.400s", error_msg + 25);
-    } else if (strncmp(error_msg, "syntax error", 12) == 0) {
-        snprintf(buffer_pt, sizeof(buffer_pt), "Erro sintatico%.400s", error_msg + 12);
-    } else {
-        strncpy(buffer_pt, error_msg, sizeof(buffer_pt));
-    }
-
-    /* Traduz a cláusula de tokens esperados */
-    if ((p = strstr(buffer_pt, ", expecting "))) {
-        char prefix[1024] = {0};
-        strncpy(prefix, buffer_pt, p - buffer_pt);
-        /* %.400s garante que nao ultrapasse o limite do buffer */
-        snprintf(error_msg, sizeof(error_msg), "%.400s, esperado %.400s", prefix, p + 12);
-    } else {
-        strncpy(error_msg, buffer_pt, sizeof(error_msg));
-    }
-
-    /* Traduz todas as conjunções de alternância 'or' para 'ou' */
-    while ((p = strstr(error_msg, " or "))) {
-        char prefix[1024] = {0};
-        strncpy(prefix, error_msg, p - error_msg);
-        snprintf(buffer_pt, sizeof(buffer_pt), "%.400s ou %.400s", prefix, p + 4);
-        strncpy(error_msg, buffer_pt, sizeof(error_msg));
-    }
-
-    /* %.800s garante pro compilador que a string de erro nunca estourará o limite global da linha */
-    snprintf(temp_str, sizeof(temp_str), "[%03d:%03d]\tERRO\t%.800s\n", 
-             yylineno, column_number, error_msg);
+    snprintf(linha_formatada, sizeof(linha_formatada), "[%03d:%03d]\tERRO\t%.800s\n", 
+             yylineno, column_number, mensagem_erro);
              
-    strcat(g_analysis_trace, temp_str);
+    strcat(g_analysis_trace, linha_formatada);
     sintatic_error_count++;
 }
