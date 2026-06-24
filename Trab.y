@@ -18,10 +18,22 @@ extern int column_number;
     typedef struct Simbolo {
         int id;
         char lexema[100];
-        int token;
         int ocorrencias;
+        char tipo;
         struct Simbolo *prox;
+        int nivelEnv;
     } Simbolo;
+
+    typedef struct Env {
+        Simbolo *tabela;
+        int nivel;
+        struct Env *prev;
+    } Env;
+
+    typedef struct Ttype{
+        char type;
+        int width;
+    } Ttype;
 }
 
 %union {
@@ -29,13 +41,25 @@ extern int column_number;
     float pontoFlutante;
     char *texto;
     Simbolo *simbolo;
+    Ttype tipoDado;
 }
+
+%code{
+    Env* envAtual;
+    Ttype tipoAtual;
+    void criarEnv();
+    void fecharEnv(void);
+    void addSimbolo(char *lexema, Ttype tipo);
+    Simbolo* buscarSimboloEnv(char *lexema, Env *env);
+    Simbolo* buscarSimboloGeral(char *lexema);
+}
+
 
 /* Habilita mensagens de erro detalhadas (mostrando o que era esperado) */
 %define parse.error verbose
 
 /* Associação dos tokens a versões em português */
-%token ID "identificador"
+%token <simbolo> ID "identificador"
 %token NUMERO_INT "numero inteiro"
 %token NUMERO_FLOAT "numero float"
 %token LITERAL "literal"
@@ -71,10 +95,14 @@ extern int column_number;
 
 %start S
 
+%type <tipoDado> tipo_dado
+
 %%
 
 S:
+    { criarEnv(); }
     elementos
+    { fecharEnv(); }
 ; 
 
 elementos:
@@ -89,9 +117,9 @@ elemento:
 ;
 
 tipo_dado:
-    TD_INTEGER
-    | TD_FLOAT
-    | TD_BOOL
+    TD_INTEGER      {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
+    | TD_FLOAT      {$$.type = 'f'; $$.width = 8; tipoAtual = $$;}
+    | TD_BOOL       {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
 ;
 
 declaracao_variavel:
@@ -99,17 +127,17 @@ declaracao_variavel:
 ;
 
 lista_declaracao_variavel:
-    lista_declaracao_variavel ',' item_declaracao_variavel 
+    lista_declaracao_variavel ',' item_declaracao_variavel
     | item_declaracao_variavel
 ;
 
 item_declaracao_variavel:
-    ID
-    | ID OP_ATRIBUICAO expressao
+    ID                              {addSimbolo( $1->lexema, tipoAtual);}
+    | ID OP_ATRIBUICAO expressao    {addSimbolo( $1->lexema, tipoAtual);}
 ;
 
 atribuicao:
-    ID OP_ATRIBUICAO expressao
+    ID OP_ATRIBUICAO expressao      
 ;
 
 declaracao_funcao:
@@ -145,7 +173,9 @@ lista_argumentos:
 ;
 
 bloco:
-    '{' comandos '}'
+    '{'         { criarEnv(); printf ("\n{\n");}
+    comandos
+    '}'         { fecharEnv();  printf ("\n}\n");}
 ;
 
 comandos:
@@ -334,26 +364,78 @@ void yyerror(const char *s) {
 }
 
 // Etapa 3
+int proxIdSimbolo = 0; //Id global independente do escopo --------- VERIFICAR SE SERA O MESMO DO LEXICO
 
-Env* envAtual;
-
-typedef struct Env {
-    Simbolo *tabela;
-    int nivel;
-    struct Env *prev;
-} Env;
 
 void criarEnv(){
     Env *novoEnv = (Env*) malloc(sizeof(Env));
+
+    if (novoEnv != NULL){
+        //Lança erro
+    }
+            
     novoEnv->prev = envAtual;
+    novoEnv->tabela = NULL;
+
     if (envAtual != NULL) {
         novoEnv->nivel = envAtual->nivel + 1;
+    } else {
+        novoEnv->nivel =0;
     }
+
     envAtual = novoEnv;
 }
 
-void addSimmbolo(){
-    
+void fecharEnv(){
+    Env* envAFechar = envAtual;
+    envAtual = envAFechar->prev;
+    free(envAFechar);
 }
+
+Simbolo* buscarSimboloEnv(char* lexema, Env* env){ //Procura num env específico
+
+    if (env != NULL){
+        Simbolo *simbolo = env->tabela; //primeiro da lista
+        while (simbolo != NULL){
+            if (strcmp(lexema, simbolo->lexema) == 0){
+                return simbolo;
+            } else {
+                simbolo = simbolo->prox;
+            }
+        }
+    }
+    return NULL;
+}
+
+Simbolo* buscarSimboloGeral(char* lexema){ //Procura em todos os envs
+    Env *env = envAtual;
+    Simbolo *encontrado;
+
+    if (env != NULL){
+        encontrado = buscarSimboloEnv(lexema, env);
+        if (encontrado != NULL){
+            return encontrado;
+        } else {
+            env = env->prev;
+        }
+    }
+    return NULL;
+} 
+
+void addSimbolo(char* lexema, Ttype tipo){
+    if (buscarSimboloEnv(lexema, envAtual) != NULL){
+        //Erro de redeclaracao de tipo -------------- A CRIAR FUNCAO
+    }
+    Simbolo *novoSimbolo = (Simbolo*) malloc(sizeof(Simbolo));
+
+    novoSimbolo->id = proxIdSimbolo++;
+    strcpy(novoSimbolo->lexema, lexema);    
+    novoSimbolo->tipo = tipo.type;
+    novoSimbolo->ocorrencias = 0;
+    novoSimbolo->prox = envAtual->tabela;
+
+    envAtual->tabela = novoSimbolo;
+}
+
 
 
