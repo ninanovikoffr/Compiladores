@@ -45,7 +45,7 @@ extern int column_number;
 }
 
 %code{
-    Env* envAtual;
+    Env* envAtual = NULL;
     Ttype tipoAtual;
     void criarEnv();
     void fecharEnv(void);
@@ -100,15 +100,18 @@ extern int column_number;
 %%
 
 S:
-    { criarEnv(); }
+    { criarEnv(); } //fechar so no final, deixar aberto enquanto fazemos o codigo
     elementos
-    { fecharEnv(); }
+    
 ; 
 
 elementos:
     elementos elemento
     | elemento
-    | error ';' { yyerrok; /* Ignora erro na raiz até encontrar um ponto e vírgula */ }
+    | elementos error ';' { yyerrok; }
+    | elementos error '}' { yyerrok; }
+    | error ';' { yyerrok; }
+    | error '}' { yyerrok; }
 ; 
 
 elemento:
@@ -137,7 +140,7 @@ item_declaracao_variavel:
 ;
 
 atribuicao:
-    ID OP_ATRIBUICAO expressao      
+    ID OP_ATRIBUICAO expressao { verificarUsoID($1->lexema); }     
 ;
 
 declaracao_funcao:
@@ -267,7 +270,7 @@ expressao_termo:
 expressao_fator:
     '(' expressao ')'
     | chamada_funcao
-    | ID
+    | ID                { verificarUsoID($1->lexema); }
     | NUMERO_INT
     | NUMERO_FLOAT
     | LITERAL
@@ -370,7 +373,7 @@ int proxIdSimbolo = 0; //Id global independente do escopo --------- VERIFICAR SE
 void criarEnv(){
     Env *novoEnv = (Env*) malloc(sizeof(Env));
 
-    if (novoEnv != NULL){
+    if (novoEnv == NULL){
         //Lança erro
     }
             
@@ -392,6 +395,17 @@ void fecharEnv(){
     free(envAFechar);
 }
 
+Simbolo* usoDoIDEnv(char* lexema, Env* env){
+    Simbolo *existe = buscarSimboloGeral(lexema);
+
+    if(existe == NULL){
+        printf("Erro: identificador '%existe' nao declarado.\n", lexema);
+        return NULL;
+    }
+
+    return existe;
+}
+
 Simbolo* buscarSimboloEnv(char* lexema, Env* env){ //Procura num env específico
 
     if (env != NULL){
@@ -411,20 +425,24 @@ Simbolo* buscarSimboloGeral(char* lexema){ //Procura em todos os envs
     Env *env = envAtual;
     Simbolo *encontrado;
 
-    if (env != NULL){
-        encontrado = buscarSimboloEnv(lexema, env);
-        if (encontrado != NULL){
-            return encontrado;
-        } else {
-            env = env->prev;
+    while(env!=NULL){
+        if (env != NULL){
+            encontrado = buscarSimboloEnv(lexema, env);
+            if (encontrado != NULL){
+                return encontrado;
+                } else {
+                env = env->prev;
+                }
         }
     }
+
     return NULL;
 } 
 
 void addSimbolo(char* lexema, Ttype tipo){
+
     if (buscarSimboloEnv(lexema, envAtual) != NULL){
-        //Erro de redeclaracao de tipo -------------- A CRIAR FUNCAO
+        //Erro de redeclaracao de variavel -------------- A CRIAR FUNCAO
     }
     Simbolo *novoSimbolo = (Simbolo*) malloc(sizeof(Simbolo));
 
