@@ -28,14 +28,13 @@ extern int column_number;
     int inteiro;
     float pontoFlutante;
     char *texto;
-    char caractere;
     Simbolo *simbolo;
 }
 
 /* Habilita mensagens de erro detalhadas (mostrando o que era esperado) */
 %define parse.error verbose
 
-/* Associação dos tokens a versões legíveis em português (aliases) */
+/* Associação dos tokens a versões em português */
 %token ID "identificador"
 %token NUMERO_INT "numero inteiro"
 %token NUMERO_FLOAT "numero float"
@@ -46,7 +45,8 @@ extern int column_number;
 %token TD_BOOL "bool"
 
 %token PR_IF "if"
-%token PR_ELSE "else"
+%right OPEN_IF /* Correção etapa2: uso de precedência para dangling else */
+%right PR_ELSE
 %token PR_WHILE "while"
 %token PR_PRINT "print"
 %token PR_READ "read"
@@ -156,11 +156,6 @@ comandos:
 ;
 
 comando:
-    comando_fechado
-    | comando_aberto
-;
-
-comando_fechado:
     atribuicao ';'
     | declaracao_variavel
     | chamada_funcao ';'
@@ -168,30 +163,17 @@ comando_fechado:
     | comando_saida
     | comando_entrada
     | comando_retorno
-    | matched_if
-    | comando_repeticao_fechado
+    | comando_repeticao
+    | comando_condicional
 ;
 
-matched_if:
-    PR_IF '(' expressao ')' comando_fechado PR_ELSE comando_fechado
+comando_condicional:
+    PR_IF '(' expressao ')' comando %prec OPEN_IF // Correção etapa2: uso de precedência para dangling else
+    | PR_IF '(' expressao ')' comando PR_ELSE comando
 ;
 
-comando_aberto:
-    open_if
-    | comando_repeticao_aberto
-;
-
-open_if:
-    PR_IF '(' expressao ')' comando
-    | PR_IF '(' expressao ')' comando_fechado PR_ELSE comando_aberto
-;
-
-comando_repeticao_fechado:
-    PR_WHILE '(' expressao ')' comando_fechado
-;
-
-comando_repeticao_aberto:
-    PR_WHILE '(' expressao ')' comando_aberto
+comando_repeticao:
+    PR_WHILE '(' expressao ')' comando
 ;
 
 comando_saida:
@@ -199,7 +181,7 @@ comando_saida:
 ;
 
 comando_entrada:
-    PR_READ '(' ID ')' ';' //verificar se so id
+    PR_READ '(' ID ')' ';'
 ; 
 
 comando_retorno:
@@ -350,3 +332,28 @@ void yyerror(const char *s) {
     strcat(g_analysis_trace, linha_formatada);
     sintatic_error_count++;
 }
+
+// Etapa 3
+
+Env* envAtual;
+
+typedef struct Env {
+    Simbolo *tabela;
+    int nivel;
+    struct Env *prev;
+} Env;
+
+void criarEnv(){
+    Env *novoEnv = (Env*) malloc(sizeof(Env));
+    novoEnv->prev = envAtual;
+    if (envAtual != NULL) {
+        novoEnv->nivel = envAtual->nivel + 1;
+    }
+    envAtual = novoEnv;
+}
+
+void addSimmbolo(){
+    
+}
+
+
