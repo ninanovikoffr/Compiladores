@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Gerar o parser com Bison
-bison -d -o parser.c Trab.y
+bison -d -o build/parser.c src/Trab.y
 
 # Gerar o analisador léxico com Flex
-flex -o lexer.c Trab.l
+flex -o build/lexer.c src/Trab.l
 
 # Compilar tudo junto
-gcc parser.c lexer.c -lfl -o saida
+gcc build/parser.c build/lexer.c -lfl -o output/saida
 
 # Executar com arquivo de teste
-./saida teste_parser.txt
+./output/saida tests/teste_parser.txt

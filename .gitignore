@@ -1,0 +1,31 @@
+# Flex/Bison generated files
+lex.yy.c
+Trab.tab.c
+Trab.tab.h
+*.tab.c
+*.tab.h
+*.output
+build/
+
+# Compiled objects and executables
+*.o
+*.out
+*.exe
+saida
+output/saida
+
+# Logs and captured terminal output
+*.log
+typescript
+output/typescript
+
+# Editor and OS temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Build system temporary directories
+dist/
+tmp/
+temp/
