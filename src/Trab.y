@@ -306,7 +306,7 @@ operador_relacional:
 
 expressao_aritmetica:
     expressao_aritmetica OA_PLUS expressao_termo {
-            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
                     $$.width = 8; 
@@ -322,7 +322,7 @@ expressao_aritmetica:
             }
         }
     | expressao_aritmetica OA_MINUS expressao_termo {
-            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
                     $$.width = 8; 
@@ -342,7 +342,7 @@ expressao_aritmetica:
 
 expressao_termo:
     expressao_termo OA_MULT expressao_fator {
-            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
                     $$.width = 8; 
@@ -358,7 +358,7 @@ expressao_termo:
             }
         }
     | expressao_termo OA_DIV expressao_fator {
-            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
                     $$.width = 8; 
