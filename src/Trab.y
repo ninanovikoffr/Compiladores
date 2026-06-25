@@ -252,6 +252,7 @@ comando_repeticao:
 
 comando_saida:
     PR_PRINT '(' expressao ')' ';'
+    | PR_PRINT '(' LITERAL ')' ';'
 ;
 
 comando_entrada:
@@ -268,26 +269,12 @@ expressao:
 ;
 
 expressao_ou:
-    expressao_ou OL_OR expressao_e {
-            if (($1.type == 'i' || $1.type == 'f' || $1.type == 'b') && ($3.type == 'i' || $3.type == 'f' || $3.type == 'b')) {
-                $$.type = 'b'; $$.width = 1;
-            } else {
-                printf("Erro semantico na linha %d: operador relacional exige int ou float.\n", yylineno);
-                $$.type = 'b'; $$.width = 1;
-            }
-        }
+    expressao_ou OL_OR expressao_e { $$.type = 'b'; $$.width = 1; }
     | expressao_e { $$ = $1; }
 ;
 
 expressao_e:
-    expressao_e OL_AND expressao_not {
-            if (($1.type == 'i' || $1.type == 'f' || $1.type == 'b') && ($3.type == 'i' || $3.type == 'f' || $3.type == 'b')) {
-                $$.type = 'b'; $$.width = 1;
-            } else {
-                printf("Erro semantico na linha %d: operador relacional exige int ou float.\n", yylineno);
-                $$.type = 'b'; $$.width = 1;
-            }
-        }
+    expressao_e OL_AND expressao_not { $$.type = 'b'; $$.width = 1; }
     | expressao_not { $$ = $1; }
 ;
 
@@ -404,10 +391,18 @@ expressao_fator:
                         }
     | NUMERO_INT        {$$.type = 'i'; $$.width = 4;}
     | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;}
-    | LITERAL           {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} //mudar
+    //| LITERAL           {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} 
     | PR_TRUE           {$$.type = 'b'; $$.width = 1;}
     | PR_FALSE          {$$.type = 'b'; $$.width = 1;}
-    | OA_MINUS expressao_fator     {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} //mudar
+    | OA_MINUS expressao_fator     {
+                            if ($2.type == 'i' || $2.type == 'f') {
+                                $$ = $2;
+                            } else {
+                                printf("Erro semantico na linha %d: operador - unario exige int ou float.\n", yylineno);
+                                $$.type = 'i';
+                                $$.width = 4;
+                            }
+                        }
 ;
 
 %%
