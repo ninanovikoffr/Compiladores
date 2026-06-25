@@ -15,11 +15,19 @@ extern int column_number;
 %}
 
 %code requires {
+
+    enum CategoriaId{
+            variavel,
+            funcao,
+            parametro
+        };
+
     typedef struct Simbolo {
         int id;
         char lexema[100];
         int ocorrencias;
         char tipo;
+        enum CategoriaId categoria;
         struct Simbolo *prox;
         int nivelEnv;
     } Simbolo;
@@ -30,7 +38,7 @@ extern int column_number;
         struct Env *prev;
     } Env;
 
-    typedef struct Ttype{
+    typedef struct Ttype {
         char type;
         int width;
     } Ttype;
@@ -49,9 +57,11 @@ extern int column_number;
     Ttype tipoAtual;
     void criarEnv();
     void fecharEnv(void);
-    void addSimbolo(char *lexema, Ttype tipo);
+    void addSimbolo(char *lexema, Ttype tipo, enum CategoriaId categoria);
+    Simbolo* usoDoIDEnv(char *lexema);
     Simbolo* buscarSimboloEnv(char *lexema, Env *env);
     Simbolo* buscarSimboloGeral(char *lexema);
+
 }
 
 
@@ -116,10 +126,10 @@ S:
 elementos:
     elementos elemento
     | elemento
-    | elementos error ';' { yyerrok; }
-    | elementos error '}' { yyerrok; }
-    | error ';' { yyerrok; }
-    | error '}' { yyerrok; }
+    | elementos error ';' { yyerrok; } //Desse jeito continua 11 erros sintaticos, com os outros vira 14
+    //| elementos error '}' { yyerrok; } 
+    //| error ';' { yyerrok; }
+    //| error '}' { yyerrok; }
 ; 
 
 elemento:
@@ -143,16 +153,16 @@ lista_declaracao_variavel:
 ;
 
 item_declaracao_variavel:
-    ID                              {addSimbolo( $1->lexema, tipoAtual);}
-    | ID OP_ATRIBUICAO expressao    {addSimbolo( $1->lexema, tipoAtual);}
+    ID                              {addSimbolo( $1->lexema, tipoAtual, variavel);}
+    | ID OP_ATRIBUICAO expressao    {addSimbolo( $1->lexema, tipoAtual, variavel);}
 ;
 
 atribuicao:
-    ID OP_ATRIBUICAO expressao { verificarUsoID($1->lexema); }     
+    ID OP_ATRIBUICAO expressao { usoDoIDEnv($1->lexema); }     
 ;
 
 declaracao_funcao:
-    tipo_dado ID '(' parametros ')' bloco
+    tipo_dado ID '(' parametros ')' bloco 
 ;  
 
 parametros:
@@ -308,6 +318,7 @@ expressao_termo:
 expressao_fator:
     '(' expressao ')'
     | chamada_funcao
+<<<<<<< HEAD
     | ID                { verificarUsoID($1->lexema); }
     | NUMERO_INT        {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
     | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8; tipoAtual = $$;}
@@ -315,6 +326,15 @@ expressao_fator:
     | PR_TRUE           {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
     | PR_FALSE          {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
     | OA_MINUS expressao_fator      
+=======
+    | ID                { usoDoIDEnv($1->lexema); }
+    | NUMERO_INT
+    | NUMERO_FLOAT
+    | LITERAL
+    | PR_TRUE
+    | PR_FALSE
+    | OA_MINUS expressao_fator
+>>>>>>> 6881de6 (Fix: funcao usoID e adicao de categoria de id)
 ;
 
 %%
@@ -433,13 +453,14 @@ void fecharEnv(){
     free(envAFechar);
 }
 
-Simbolo* usoDoIDEnv(char* lexema, Env* env){
+Simbolo* usoDoIDEnv(char* lexema){
     Simbolo *existe = buscarSimboloGeral(lexema);
 
     if(existe == NULL){
-        printf("Erro: identificador '%existe' nao declarado.\n", lexema);
+        printf("Erro: identificador '%s' nao declarado.\n", lexema);
         return NULL;
     }
+    existe->ocorrencias++;
 
     return existe;
 }
@@ -477,7 +498,7 @@ Simbolo* buscarSimboloGeral(char* lexema){ //Procura em todos os envs
     return NULL;
 } 
 
-void addSimbolo(char* lexema, Ttype tipo){
+void addSimbolo(char* lexema, Ttype tipo, enum CategoriaId categoria){
 
     if (buscarSimboloEnv(lexema, envAtual) != NULL){
         //Erro de redeclaracao de variavel -------------- A CRIAR FUNCAO
@@ -487,6 +508,7 @@ void addSimbolo(char* lexema, Ttype tipo){
     novoSimbolo->id = proxIdSimbolo++;
     strcpy(novoSimbolo->lexema, lexema);    
     novoSimbolo->tipo = tipo.type;
+    novoSimbolo->categoria = categoria;
     novoSimbolo->ocorrencias = 0;
     novoSimbolo->prox = envAtual->tabela;
 
