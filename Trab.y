@@ -96,6 +96,14 @@ extern int column_number;
 %start S
 
 %type <tipoDado> tipo_dado
+%type <tipoDado> expressao
+%type <tipoDado> expressao_e
+%type <tipoDado> expressao_ou
+%type <tipoDado> expressao_not
+%type <tipoDado> expressao_fator
+%type <tipoDado> expressao_aritmetica
+%type <tipoDado> expressao_relacional
+
 
 %%
 
@@ -256,27 +264,57 @@ operador_relacional:
 ;
 
 expressao_aritmetica:
-    expressao_aritmetica OA_PLUS expressao_termo
+    expressao_aritmetica OA_PLUS expressao_termo 
+        {
+            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+                if($1.type == 'f' || $3.type == 'f'){
+                    $$.type = 'f';
+                    $$.width = 8; 
+                }
+                else {
+                    $$.type = 'i';
+                    $$.width = 4;
+                }
+            }
+            else {
+                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser somados.\n", yylineno);
+            }
+        }
     | expressao_aritmetica OA_MINUS expressao_termo
-    | expressao_termo
+        {
+            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+                if($1.type == 'f' || $3.type == 'f'){
+                    $$.type = 'f';
+                    $$.width = 8; 
+                }
+                else {
+                    $$.type = 'i';
+                    $$.width = 4;
+                }
+            }
+            else {
+                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser subtraidos.\n", yylineno);
+            }
+        }
+    | expressao_termo { $$ = $1;}
 ;
 
 expressao_termo:
     expressao_termo OA_MULT expressao_fator
     | expressao_termo OA_DIV expressao_fator
-    | expressao_fator
+    | expressao_fator { $$ = $1;}
 ;
 
 expressao_fator:
     '(' expressao ')'
     | chamada_funcao
     | ID                { verificarUsoID($1->lexema); }
-    | NUMERO_INT
-    | NUMERO_FLOAT
-    | LITERAL
-    | PR_TRUE
-    | PR_FALSE
-    | OA_MINUS expressao_fator
+    | NUMERO_INT        {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
+    | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8; tipoAtual = $$;}
+    | LITERAL           
+    | PR_TRUE           {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
+    | PR_FALSE          {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
+    | OA_MINUS expressao_fator      
 ;
 
 %%
