@@ -111,6 +111,7 @@ extern int column_number;
 %type <tipoDado> expressao_ou
 %type <tipoDado> expressao_not
 %type <tipoDado> expressao_fator
+%type <tipoDado> expressao_termo
 %type <tipoDado> expressao_aritmetica
 %type <tipoDado> expressao_relacional
 
@@ -241,27 +242,27 @@ comando_retorno:
 ;
 
 expressao:
-    expressao_ou
+    expressao_ou { $$ = $1;}
 ;
 
 expressao_ou:
     expressao_ou OL_OR expressao_e
-    | expressao_e
+    | expressao_e { $$ = $1;}
 ;
 
 expressao_e:
     expressao_e OL_AND expressao_not
-    | expressao_not
+    | expressao_not { $$ = $1;}
 ;
 
 expressao_not:
     OL_NOT expressao_relacional
-    | expressao_relacional
+    | expressao_relacional { $$ = $1;}
 ;
 
 expressao_relacional:
     expressao_aritmetica operador_relacional expressao_aritmetica
-    | expressao_aritmetica
+    | expressao_aritmetica 
 ;
 
 operador_relacional:
@@ -311,30 +312,50 @@ expressao_aritmetica:
 
 expressao_termo:
     expressao_termo OA_MULT expressao_fator
+        {
+            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+                if($1.type == 'f' || $3.type == 'f'){
+                    $$.type = 'f';
+                    $$.width = 8; 
+                }
+                else {
+                    $$.type = 'i';
+                    $$.width = 4;
+                }
+            }
+            else {
+                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser multiplicados.\n", yylineno);
+            }
+        }
     | expressao_termo OA_DIV expressao_fator
+        {
+            if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
+                if($1.type == 'f' || $3.type == 'f'){
+                    $$.type = 'f';
+                    $$.width = 8; 
+                }
+                else {
+                    $$.type = 'i';
+                    $$.width = 4;
+                }
+            }
+            else {
+                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser divididos.\n", yylineno);
+            }
+        }
     | expressao_fator { $$ = $1;}
 ;
 
 expressao_fator:
-    '(' expressao ')'
+    '(' expressao ')'   {$$ = $2;}
     | chamada_funcao
-<<<<<<< HEAD
-    | ID                { verificarUsoID($1->lexema); }
-    | NUMERO_INT        {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
-    | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8; tipoAtual = $$;}
-    | LITERAL           
-    | PR_TRUE           {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
-    | PR_FALSE          {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
-    | OA_MINUS expressao_fator      
-=======
     | ID                { usoDoIDEnv($1->lexema); }
-    | NUMERO_INT
-    | NUMERO_FLOAT
-    | LITERAL
-    | PR_TRUE
-    | PR_FALSE
-    | OA_MINUS expressao_fator
->>>>>>> 6881de6 (Fix: funcao usoID e adicao de categoria de id)
+    | NUMERO_INT        {$$.type = 'i'; $$.width = 4;}
+    | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;}
+    | LITERAL           
+    | PR_TRUE           {$$.type = 'b'; $$.width = 1;}
+    | PR_FALSE          {$$.type = 'b'; $$.width = 1;}
+    | OA_MINUS expressao_fator      
 ;
 
 %%

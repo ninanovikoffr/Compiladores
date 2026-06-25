@@ -47,15 +47,35 @@ extern int yydebug;
 /* "%code requires" blocks.  */
 #line 17 "Trab.y"
 
+
+    enum CategoriaId{
+            variavel,
+            funcao,
+            parametro
+        };
+
     typedef struct Simbolo {
         int id;
         char lexema[100];
-        int token;
         int ocorrencias;
+        char tipo;
+        enum CategoriaId categoria;
         struct Simbolo *prox;
+        int nivelEnv;
     } Simbolo;
 
-#line 59 "parser.h"
+    typedef struct Env {
+        Simbolo *tabela;
+        int nivel;
+        struct Env *prev;
+    } Env;
+
+    typedef struct Ttype {
+        char type;
+        int width;
+    } Ttype;
+
+#line 79 "parser.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -74,27 +94,28 @@ extern int yydebug;
     TD_FLOAT = 263,                /* "float"  */
     TD_BOOL = 264,                 /* "bool"  */
     PR_IF = 265,                   /* "if"  */
-    PR_ELSE = 266,                 /* "else"  */
-    PR_WHILE = 267,                /* "while"  */
-    PR_PRINT = 268,                /* "print"  */
-    PR_READ = 269,                 /* "read"  */
-    PR_RETURN = 270,               /* "return"  */
-    PR_TRUE = 271,                 /* "true"  */
-    PR_FALSE = 272,                /* "false"  */
-    OA_PLUS = 273,                 /* "+"  */
-    OA_MINUS = 274,                /* "-"  */
-    OA_MULT = 275,                 /* "*"  */
-    OA_DIV = 276,                  /* "/"  */
-    OR_LT = 277,                   /* "<"  */
-    OR_GT = 278,                   /* ">"  */
-    OR_EQ = 279,                   /* "=="  */
-    OR_LE = 280,                   /* "<="  */
-    OR_GE = 281,                   /* ">="  */
-    OR_NE = 282,                   /* "!="  */
-    OL_AND = 283,                  /* "&&"  */
-    OL_OR = 284,                   /* "||"  */
-    OL_NOT = 285,                  /* "!"  */
-    OP_ATRIBUICAO = 286            /* "="  */
+    OPEN_IF = 266,                 /* OPEN_IF  */
+    PR_ELSE = 267,                 /* PR_ELSE  */
+    PR_WHILE = 268,                /* "while"  */
+    PR_PRINT = 269,                /* "print"  */
+    PR_READ = 270,                 /* "read"  */
+    PR_RETURN = 271,               /* "return"  */
+    PR_TRUE = 272,                 /* "true"  */
+    PR_FALSE = 273,                /* "false"  */
+    OA_PLUS = 274,                 /* "+"  */
+    OA_MINUS = 275,                /* "-"  */
+    OA_MULT = 276,                 /* "*"  */
+    OA_DIV = 277,                  /* "/"  */
+    OR_LT = 278,                   /* "<"  */
+    OR_GT = 279,                   /* ">"  */
+    OR_EQ = 280,                   /* "=="  */
+    OR_LE = 281,                   /* "<="  */
+    OR_GE = 282,                   /* ">="  */
+    OR_NE = 283,                   /* "!="  */
+    OL_AND = 284,                  /* "&&"  */
+    OL_OR = 285,                   /* "||"  */
+    OL_NOT = 286,                  /* "!"  */
+    OP_ATRIBUICAO = 287            /* "="  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -103,15 +124,15 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 27 "Trab.y"
+#line 47 "Trab.y"
 
     int inteiro;
     float pontoFlutante;
     char *texto;
-    char caractere;
     Simbolo *simbolo;
+    Ttype tipoDado;
 
-#line 115 "parser.h"
+#line 136 "parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
