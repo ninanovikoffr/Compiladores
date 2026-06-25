@@ -6,18 +6,17 @@ Trab.tab.h
 *.tab.h
 *.output
 build/
+output/
 
 # Compiled objects and executables
 *.o
 *.out
 *.exe
 saida
-output/saida
 
 # Logs and captured terminal output
 *.log
 typescript
-output/typescript
 
 # Editor and OS temporary files
 *~
