@@ -264,27 +264,48 @@ comando_retorno:
 ;
 
 expressao:
-    expressao_ou { $$ = $1;}
+    expressao_ou { $$ = $1; }
 ;
 
 expressao_ou:
-    expressao_ou OL_OR expressao_e
-    | expressao_e { $$ = $1;}
+    expressao_ou OL_OR expressao_e {
+            if (($1.type == 'i' || $1.type == 'f' || $1.type == 'b') && ($3.type == 'i' || $3.type == 'f' || $3.type == 'b')) {
+                $$.type = 'b'; $$.width = 1;
+            } else {
+                printf("Erro semantico na linha %d: operador relacional exige int ou float.\n", yylineno);
+                $$.type = 'b'; $$.width = 1;
+            }
+        }
+    | expressao_e { $$ = $1; }
 ;
 
 expressao_e:
-    expressao_e OL_AND expressao_not
-    | expressao_not { $$ = $1;}
+    expressao_e OL_AND expressao_not {
+            if (($1.type == 'i' || $1.type == 'f' || $1.type == 'b') && ($3.type == 'i' || $3.type == 'f' || $3.type == 'b')) {
+                $$.type = 'b'; $$.width = 1;
+            } else {
+                printf("Erro semantico na linha %d: operador relacional exige int ou float.\n", yylineno);
+                $$.type = 'b'; $$.width = 1;
+            }
+        }
+    | expressao_not { $$ = $1; }
 ;
 
 expressao_not:
-    OL_NOT expressao_relacional {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
-    | expressao_relacional { $$ = $1;}
+    OL_NOT expressao_relacional { $$.type = 'b'; $$.width = 1; }
+    | expressao_relacional { $$ = $1; }
 ;
 
 expressao_relacional:
-    expressao_aritmetica operador_relacional expressao_aritmetica
-    | expressao_aritmetica  { $$ = $1;}
+    expressao_aritmetica operador_relacional expressao_aritmetica {
+            if (($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')) {
+                $$.type = 'b'; $$.width = 1;
+            } else {
+                printf("Erro semantico na linha %d: operador relacional exige int ou float.\n", yylineno);
+                $$.type = 'b'; $$.width = 1;
+            }
+        }
+    | expressao_aritmetica  { $$ = $1; }
 ;
 
 operador_relacional:
@@ -310,6 +331,7 @@ expressao_aritmetica:
             }
             else {
                 printf("Erro semantico na linha %d: Apenas tipos int e float podem ser somados.\n", yylineno);
+                $$.type = 'i'; $$.width = 4;
             }
         }
     | expressao_aritmetica OA_MINUS expressao_termo {
@@ -325,9 +347,10 @@ expressao_aritmetica:
             }
             else {
                 printf("Erro semantico na linha %d: Apenas tipos int e float podem ser subtraidos.\n", yylineno);
+                $$.type = 'i'; $$.width = 4;
             }
         }
-    | expressao_termo { $$ = $1;}
+    | expressao_termo { $$ = $1; }
 ;
 
 expressao_termo:
@@ -344,6 +367,7 @@ expressao_termo:
             }
             else {
                 printf("Erro semantico na linha %d: Apenas tipos int e float podem ser multiplicados.\n", yylineno);
+                $$.type = 'i'; $$.width = 4;
             }
         }
     | expressao_termo OA_DIV expressao_fator {
@@ -359,9 +383,11 @@ expressao_termo:
             }
             else {
                 printf("Erro semantico na linha %d: Apenas tipos int e float podem ser divididos.\n", yylineno);
+                $$.type = 'i'; $$.width = 4; // seguro pro parser continuar
+
             }
         }
-    | expressao_fator { $$ = $1;}
+    | expressao_fator { $$ = $1; }
 ;
 
 expressao_fator:
@@ -378,10 +404,10 @@ expressao_fator:
                         }
     | NUMERO_INT        {$$.type = 'i'; $$.width = 4;}
     | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;}
-    | LITERAL           {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
+    | LITERAL           {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} //mudar
     | PR_TRUE           {$$.type = 'b'; $$.width = 1;}
     | PR_FALSE          {$$.type = 'b'; $$.width = 1;}
-    | OA_MINUS expressao_fator     {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} 
+    | OA_MINUS expressao_fator     {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} //mudar
 ;
 
 %%
