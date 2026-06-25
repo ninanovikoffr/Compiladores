@@ -127,7 +127,6 @@ Simbolo* buscarOuInserirSimbolo(const char *lexema) {
     Simbolo *novo = malloc(sizeof(Simbolo));
     novo->id = proximo_id++;
     strcpy(novo->lexema, lexema);
-    novo->token = ID;
     novo->ocorrencias = 1;
     novo->prox = tabela[indice];
     tabela[indice] = novo;
