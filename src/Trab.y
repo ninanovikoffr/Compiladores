@@ -22,11 +22,16 @@ extern int column_number;
             parametro
         };
 
+    typedef struct Ttype {
+        char type;
+        int width;
+    } Ttype;
+
     typedef struct Simbolo {
         int id;
         char lexema[100];
         int ocorrencias;
-        char tipo;
+        Ttype tipo;
         enum CategoriaId categoria;
         struct Simbolo *prox;
         int nivelEnv;
@@ -38,10 +43,6 @@ extern int column_number;
         struct Env *prev;
     } Env;
 
-    typedef struct Ttype {
-        char type;
-        int width;
-    } Ttype;
 }
 
 %union {
@@ -154,12 +155,33 @@ lista_declaracao_variavel:
 ;
 
 item_declaracao_variavel:
-    ID                              {addSimbolo( $1->lexema, tipoAtual, variavel);}
-    | ID OP_ATRIBUICAO expressao    {addSimbolo( $1->lexema, tipoAtual, variavel);}
+    ID                           {addSimbolo( $1->lexema, tipoAtual, variavel);}
+    | ID OP_ATRIBUICAO expressao {
+            if (tipoAtual.type == $3.type || (tipoAtual.type == 'f' && $3.type == 'i'))
+            {
+                addSimbolo($1->lexema, tipoAtual, variavel);
+            } else {
+                printf("Erro semantico na linha %d: inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.\n",
+                       yylineno, $1->lexema, tipoAtual.type, $3.type);
+
+                addSimbolo($1->lexema, tipoAtual, variavel);
+            }
+        }
 ;
 
 atribuicao:
-    ID OP_ATRIBUICAO expressao { usoDoIDEnv($1->lexema); }     
+    ID OP_ATRIBUICAO expressao {
+
+            Simbolo *existeS = usoDoIDEnv($1->lexema);
+
+            if (existeS != NULL) {
+                if (existeS->tipo.type == $3.type || (existeS->tipo.type == 'f' && $3.type == 'i')) {
+                    //ainda nao precisa fazer nada
+                } else {
+                    printf("Erro semantico na linha %d: atribuicao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.\n", yylineno, $1->lexema, existeS->tipo.type, $3.type);
+                }
+            }
+        }     
 ;
 
 declaracao_funcao:
@@ -256,13 +278,13 @@ expressao_e:
 ;
 
 expressao_not:
-    OL_NOT expressao_relacional
+    OL_NOT expressao_relacional {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
     | expressao_relacional { $$ = $1;}
 ;
 
 expressao_relacional:
     expressao_aritmetica operador_relacional expressao_aritmetica
-    | expressao_aritmetica 
+    | expressao_aritmetica  { $$ = $1;}
 ;
 
 operador_relacional:
@@ -275,8 +297,7 @@ operador_relacional:
 ;
 
 expressao_aritmetica:
-    expressao_aritmetica OA_PLUS expressao_termo 
-        {
+    expressao_aritmetica OA_PLUS expressao_termo {
             if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
@@ -291,8 +312,7 @@ expressao_aritmetica:
                 printf("Erro semantico na linha %d: Apenas tipos int e float podem ser somados.\n", yylineno);
             }
         }
-    | expressao_aritmetica OA_MINUS expressao_termo
-        {
+    | expressao_aritmetica OA_MINUS expressao_termo {
             if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
@@ -311,8 +331,7 @@ expressao_aritmetica:
 ;
 
 expressao_termo:
-    expressao_termo OA_MULT expressao_fator
-        {
+    expressao_termo OA_MULT expressao_fator {
             if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
@@ -327,8 +346,7 @@ expressao_termo:
                 printf("Erro semantico na linha %d: Apenas tipos int e float podem ser multiplicados.\n", yylineno);
             }
         }
-    | expressao_termo OA_DIV expressao_fator
-        {
+    | expressao_termo OA_DIV expressao_fator {
             if(($1.type == 'f' || $3.type == 'i') && ($1.type == 'i' || $3.type == 'f')){
                 if($1.type == 'f' || $3.type == 'f'){
                     $$.type = 'f';
@@ -348,14 +366,22 @@ expressao_termo:
 
 expressao_fator:
     '(' expressao ')'   {$$ = $2;}
-    | chamada_funcao
-    | ID                { usoDoIDEnv($1->lexema); }
+    | chamada_funcao    {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
+    | ID                {Simbolo *existeDenovo = usoDoIDEnv($1->lexema); 
+                            if (existeDenovo != NULL){
+                                $$ = existeDenovo->tipo;
+                            } 
+                            else {
+                                $$.type = 'i';
+                                $$.width = 4; //valor seguro pro parser continuar
+                            }
+                        }
     | NUMERO_INT        {$$.type = 'i'; $$.width = 4;}
     | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;}
-    | LITERAL           
+    | LITERAL           {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
     | PR_TRUE           {$$.type = 'b'; $$.width = 1;}
     | PR_FALSE          {$$.type = 'b'; $$.width = 1;}
-    | OA_MINUS expressao_fator      
+    | OA_MINUS expressao_fator     {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} 
 ;
 
 %%
@@ -528,7 +554,7 @@ void addSimbolo(char* lexema, Ttype tipo, enum CategoriaId categoria){
 
     novoSimbolo->id = proxIdSimbolo++;
     strcpy(novoSimbolo->lexema, lexema);    
-    novoSimbolo->tipo = tipo.type;
+    novoSimbolo->tipo = tipo;
     novoSimbolo->categoria = categoria;
     novoSimbolo->ocorrencias = 0;
     novoSimbolo->prox = envAtual->tabela;
