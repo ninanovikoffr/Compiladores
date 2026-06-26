@@ -72,6 +72,9 @@ extern int column_number;
 
     void semanticError(const char *formato, ...);
     void print_analise_semantica(void);
+
+    int isNumeric(Ttype tipo);
+    Ttype tipoAritmeticoResultante(Ttype tipo1, Ttype tipo2, const char *operador);
 }
 
 
@@ -321,76 +324,26 @@ operador_relacional:
 
 expressao_aritmetica:
     expressao_aritmetica OA_PLUS expressao_termo {
-            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
-                if($1.type == 'f' || $3.type == 'f'){
-                    $$.type = 'f';
-                    $$.width = 8; 
-                }
-                else {
-                    $$.type = 'i';
-                    $$.width = 4;
-                }
-            }
-            else {
-                semanticError("apenas int e float podem ser somados.");
-                $$.type = 'i'; $$.width = 4;
-            }
-        }
+        $$ = tipoAritmeticoResultante($1, $3, "+");
+    }
     | expressao_aritmetica OA_MINUS expressao_termo {
-            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
-                if($1.type == 'f' || $3.type == 'f'){
-                    $$.type = 'f';
-                    $$.width = 8; 
-                }
-                else {
-                    $$.type = 'i';
-                    $$.width = 4;
-                }
-            }
-            else {
-                semanticError("apenas int e float podem ser subtraidos.");
-                $$.type = 'i'; $$.width = 4;
-            }
-        }
-    | expressao_termo { $$ = $1; }
+        $$ = tipoAritmeticoResultante($1, $3, "-");
+    }
+    | expressao_termo {
+        $$ = $1;
+    }
 ;
 
 expressao_termo:
     expressao_termo OA_MULT expressao_fator {
-            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
-                if($1.type == 'f' || $3.type == 'f'){
-                    $$.type = 'f';
-                    $$.width = 8; 
-                }
-                else {
-                    $$.type = 'i';
-                    $$.width = 4;
-                }
-            }
-            else {
-                semanticError("apenas int e float podem ser multiplicados.");
-                $$.type = 'i'; $$.width = 4;
-            }
-        }
+        $$ = tipoAritmeticoResultante($1, $3, "*");
+    }
     | expressao_termo OA_DIV expressao_fator {
-            if(($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')){
-                if($1.type == 'f' || $3.type == 'f'){
-                    $$.type = 'f';
-                    $$.width = 8; 
-                }
-                else {
-                    $$.type = 'i';
-                    $$.width = 4;
-                }
-            }
-            else {
-                semanticError("apenas int e float podem ser divididos.");
-                $$.type = 'i'; $$.width = 4; // seguro pro parser continuar
-
-            }
-        }
+        $$ = tipoAritmeticoResultante($1, $3, "/");
+    }
     | expressao_fator { $$ = $1; }
 ;
+
 
 expressao_fator:
     '(' expressao ')'   {$$ = $2;}
@@ -526,6 +479,32 @@ void semanticError(const char *formato, ...) {
     strncat(g_semantic_trace, linha_formatada, sizeof(g_semantic_trace) - strlen(g_semantic_trace) - 1);
 
     semantic_error_count++;
+}
+
+int isNumeric(Ttype tipo) {
+    return (tipo.type == 'i' || tipo.type == 'f');
+}
+
+Ttype tipoAritmeticoResultante(Ttype tipo1, Ttype tipo2, const char *operador) {
+    Ttype resultado;
+
+    if (!isNumeric(tipo1) || !isNumeric(tipo2)) {
+        semanticError("operador aritmetico '%s' exige operandos int ou float.", operador);
+
+        resultado.type = 'i';
+        resultado.width = 4;
+        return resultado;
+    }
+
+    if (tipo1.type == 'f' || tipo2.type == 'f') {
+        resultado.type = 'f';
+        resultado.width = 8;
+    } else {
+        resultado.type = 'i';
+        resultado.width = 4;
+    }
+
+    return resultado;
 }
 
 int proxIdSimbolo = 0; //Id global independente do escopo --------- VERIFICAR SE SERA O MESMO DO LEXICO
