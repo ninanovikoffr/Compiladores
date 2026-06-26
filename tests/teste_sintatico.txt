@@ -1,8 +1,15 @@
 // Teste válido para o analisador sintático
 
 int $x = -5;
+
+{
 float $y = 3.14;
+<<<<<<< HEAD:tests/teste_sintatico.txt
 int $ativo = 1;
+=======
+}
+bool $ativo = true;
+>>>>>>> a154ad6 (feat: escopo de funcao e parametros na tabela de simbolos):tests/teste_parser.txt
 
 int $soma(int $a, int $b) {
     int $resultado;

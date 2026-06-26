@@ -60,6 +60,8 @@ extern int column_number;
 %code{
     Env* envAtual = NULL;
     Ttype tipoAtual;
+    Ttype tipoRetornoAtual;
+    Simbolo* funcaoAtual;
 
     void criarEnv();
     void fecharEnv(void);
@@ -120,12 +122,12 @@ extern int column_number;
 %type <tipoDado> expressao_aritmetica
 %type <tipoDado> expressao_relacional
 
-
 %%
 
 S:
-    { criarEnv(); } //fechar so no final, deixar aberto enquanto fazemos o codigo
+    { criarEnv(); } 
     elementos
+    { /*fecharEnv(); */} //fechar so no final, deixar aberto enquanto fazemos o codigo
     
 ; 
 
@@ -144,12 +146,12 @@ elemento:
 ;
 
 tipo_dado:
-    TD_INTEGER      {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
+    TD_INTEGER      {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} 
     | TD_FLOAT      {$$.type = 'f'; $$.width = 8; tipoAtual = $$;}
 ;
 
 declaracao_variavel:
-    tipo_dado lista_declaracao_variavel ';'
+    tipo_dado lista_declaracao_variavel ';' // tipoAtual vai ser como o atributo herdado
 ;
 
 lista_declaracao_variavel:
@@ -164,10 +166,10 @@ item_declaracao_variavel:
             {
                 addSimbolo($1->lexema, tipoAtual, variavel);
             } else {
-                semanticError("inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
-                            $1->lexema, tipoAtual.type, $3.type);
+                semanticError("Inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
+                       $1->lexema, tipoAtual.type, $3.type);
 
-                addSimbolo($1->lexema, tipoAtual, variavel);
+                addSimbolo($1->lexema, tipoAtual, variavel); // Pra continuar a análise
             }
         }
 ;
@@ -188,7 +190,9 @@ atribuicao:
 ;
 
 declaracao_funcao:
-    tipo_dado ID '(' parametros ')' bloco 
+    tipo_dado ID                            { addSimbolo($2->lexema, tipoAtual, funcao); tipoRetornoAtual = tipoAtual; funcaoAtual = buscarSimboloGeral($2->lexema); }
+    '('                                     { criarEnv(); } 
+    parametros ')' '{' comandos '}'         { fecharEnv(); }
 ;  
 
 parametros:
@@ -202,7 +206,7 @@ lista_parametros:
 ;
 
 parametro:
-    tipo_dado ID
+    tipo_dado ID            { addSimbolo($2->lexema, tipoAtual, parametro); }
 ;
 
 chamada_funcao:
@@ -220,9 +224,9 @@ lista_argumentos:
 ;
 
 bloco:
-    '{'         { criarEnv(); printf ("\n{\n");}
+    '{'         { criarEnv();}
     comandos
-    '}'         { fecharEnv();  printf ("\n}\n");}
+    '}'         { fecharEnv();}
 ;
 
 comandos:
@@ -263,8 +267,16 @@ comando_entrada:
 ; 
 
 comando_retorno:
-    PR_RETURN expressao ';'
-    | PR_RETURN ';'
+    PR_RETURN expressao {
+        if (tipoRetornoAtual.type != $2.type)
+            semanticError("Retorno da funcao incompativel. A funcao '%s' e tipo %c, mas o retorno e do tipo %c.",
+                funcaoAtual->lexema, tipoRetornoAtual.type, $2.type);
+        }
+    ';'
+    | PR_RETURN ';' {
+        semanticError("Retorno sem valor na funcao , que e do tipo %c.",
+            funcaoAtual->lexema,  tipoRetornoAtual.type);
+    }
 ;
 
 expressao:
@@ -614,6 +626,7 @@ void addSimbolo(char* lexema, Ttype tipo, enum CategoriaId categoria){
     novoSimbolo->tipo = tipo;
     novoSimbolo->categoria = categoria;
     novoSimbolo->ocorrencias = 0;
+    novoSimbolo->nivelEnv = envAtual->nivel;
     novoSimbolo->prox = envAtual->tabela;
 
     envAtual->tabela = novoSimbolo;
