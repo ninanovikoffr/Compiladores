@@ -3,12 +3,16 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdarg.h>
 
 int yylex(void);
 void yyerror(const char *s);
 
 int sintatic_error_count = 0;
 char g_analysis_trace[10000] = "[Lin:Col]\tACAO\tDETALHE\n";
+
+int semantic_error_count = 0;
+char g_semantic_trace[20000] = "[Lin:Col]\tERRO SEMANTICO\n";
 
 extern int yylineno;
 extern int column_number;
@@ -56,6 +60,7 @@ extern int column_number;
 %code{
     Env* envAtual = NULL;
     Ttype tipoAtual;
+
     void criarEnv();
     void fecharEnv(void);
     void addSimbolo(char *lexema, Ttype tipo, enum CategoriaId categoria);
@@ -63,6 +68,8 @@ extern int column_number;
     Simbolo* buscarSimboloEnv(char *lexema, Env *env);
     Simbolo* buscarSimboloGeral(char *lexema);
 
+    void semanticError(const char *formato, ...);
+    void print_analise_semantica(void);
 }
 
 
@@ -161,7 +168,7 @@ item_declaracao_variavel:
             {
                 addSimbolo($1->lexema, tipoAtual, variavel);
             } else {
-                printf("Erro semantico na linha %d: inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.\n",
+                semanticError("Inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
                        yylineno, $1->lexema, tipoAtual.type, $3.type);
 
                 addSimbolo($1->lexema, tipoAtual, variavel);
@@ -178,7 +185,7 @@ atribuicao:
                 if (existeS->tipo.type == $3.type || (existeS->tipo.type == 'f' && $3.type == 'i')) {
                     //ainda nao precisa fazer nada
                 } else {
-                    printf("Erro semantico na linha %d: atribuicao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.\n", yylineno, $1->lexema, existeS->tipo.type, $3.type);
+                    semanticError("atribuicao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.", $1->lexema, existeS->tipo.type, $3.type);
                 }
             }
         }     
@@ -288,7 +295,7 @@ expressao_relacional:
             if (($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')) {
                 $$.type = 'b'; $$.width = 1;
             } else {
-                printf("Erro semantico na linha %d: operador relacional exige int ou float.\n", yylineno);
+                semanticError("operador relacional exige int ou float.");
                 $$.type = 'b'; $$.width = 1;
             }
         }
@@ -317,7 +324,7 @@ expressao_aritmetica:
                 }
             }
             else {
-                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser somados.\n", yylineno);
+                semanticError("apenas int e float podem ser somados.");
                 $$.type = 'i'; $$.width = 4;
             }
         }
@@ -333,7 +340,7 @@ expressao_aritmetica:
                 }
             }
             else {
-                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser subtraidos.\n", yylineno);
+                semanticError("apenas int e float podem ser subtraidos.");
                 $$.type = 'i'; $$.width = 4;
             }
         }
@@ -353,7 +360,7 @@ expressao_termo:
                 }
             }
             else {
-                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser multiplicados.\n", yylineno);
+                semanticError("apenas int e float podem ser multiplicados.");
                 $$.type = 'i'; $$.width = 4;
             }
         }
@@ -369,7 +376,7 @@ expressao_termo:
                 }
             }
             else {
-                printf("Erro semantico na linha %d: Apenas tipos int e float podem ser divididos.\n", yylineno);
+                semanticError("apenas int e float podem ser divididos.");
                 $$.type = 'i'; $$.width = 4; // seguro pro parser continuar
 
             }
@@ -398,7 +405,7 @@ expressao_fator:
                             if ($2.type == 'i' || $2.type == 'f') {
                                 $$ = $2;
                             } else {
-                                printf("Erro semantico na linha %d: operador - unario exige int ou float.\n", yylineno);
+                                semanticError("operador - unario exige int ou float.");
                                 $$.type = 'i';
                                 $$.width = 4;
                             }
@@ -443,41 +450,6 @@ void print_analise_sintatica(void) {
     printf("===================================================================\n");
 }
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        fprintf(stderr, "Uso: %s arquivo_entrada\n", argv[0]);
-        return 1;
-    }
-
-    yyin = fopen(argv[1], "r");
-    if (yyin == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo: %s\n", argv[1]);
-        return 1;
-    }
-
-    yyout = stdout;
-
-    // --- Cabeçalho da análise léxica ---
-    printf("===================================================================\n");
-    printf("                        ANALISE LÉXICA\n");
-    printf("===================================================================\n");
-    fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
-    fprintf(yyout, "-------------------------------------------------------------\n");
-
-    // Executa o lexer
-    yyparse();
-
-    // --- Imprime a tabela de símbolos após a análise léxica ---
-    fprintf(yyout, "\nTABELA DE SÍMBOLOS\n");
-    fprintf(yyout, "================================================================");
-    imprimirTabela();  // função que percorre a lista de símbolos
-
-    print_analise_sintatica(); // Imprime a tabela de análise sintática
-
-    fclose(yyin);
-    return (sintatic_error_count > 0) ? 1 : 0;
-}
-
 void yyerror(const char *s) {
     char linha_formatada[1024];
     char mensagem_erro[1024];
@@ -493,6 +465,55 @@ void yyerror(const char *s) {
 }
 
 // Etapa 3
+
+void print_analise_semantica(void) {
+    printf("\n");
+    printf("===================================================================\n");
+    printf("                        ANALISE SEMANTICA\n");
+    printf("===================================================================\n");
+    printf("[Lin:Col]\tERRO SEMANTICO\n");
+    printf("-------------------------------------------------------------------\n");
+
+    char* trace_copy = strdup(g_semantic_trace);
+    if (!trace_copy) return;
+
+    char* line = strtok(trace_copy, "\n");
+    line = strtok(NULL, "\n");
+
+    while (line != NULL) {
+        printf("%s\n", line);
+        line = strtok(NULL, "\n");
+    }
+
+    free(trace_copy);
+
+    printf("-------------------------------------------------------------------\n");
+
+    if (semantic_error_count == 0) {
+        printf("Analise semantica concluida com SUCESSO!\n");
+    } else {
+        printf("Analise semantica concluida com %d erro(s).\n", semantic_error_count);
+    }
+
+    printf("===================================================================\n");
+}
+
+void semanticError(const char *formato, ...) {
+    char mensagem[1024];
+    char linha_formatada[1200];
+
+    va_list args;
+    va_start(args, formato);
+    vsnprintf(mensagem, sizeof(mensagem), formato, args);
+    va_end(args);
+
+    snprintf(linha_formatada, sizeof(linha_formatada), "[%03d:%03d]\t%s\n", yylineno, column_number, mensagem);
+
+    strncat(g_semantic_trace, linha_formatada, sizeof(g_semantic_trace) - strlen(g_semantic_trace) - 1);
+
+    semantic_error_count++;
+}
+
 int proxIdSimbolo = 0; //Id global independente do escopo --------- VERIFICAR SE SERA O MESMO DO LEXICO
 
 
@@ -525,7 +546,7 @@ Simbolo* usoDoIDEnv(char* lexema){
     Simbolo *existe = buscarSimboloGeral(lexema);
 
     if(existe == NULL){
-        printf("Erro: identificador '%s' nao declarado.\n", lexema);
+        semanticError("identificador '%s' nao declarado.", lexema);
         return NULL;
     }
     existe->ocorrencias++;
@@ -581,6 +602,48 @@ void addSimbolo(char* lexema, Ttype tipo, enum CategoriaId categoria){
     novoSimbolo->prox = envAtual->tabela;
 
     envAtual->tabela = novoSimbolo;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        fprintf(stderr, "Uso: %s arquivo_entrada\n", argv[0]);
+        return 1;
+    }
+
+    yyin = fopen(argv[1], "r");
+    if (yyin == NULL) {
+        fprintf(stderr, "Erro ao abrir o arquivo: %s\n", argv[1]);
+        return 1;
+    }
+
+    yyout = stdout;
+
+    // --- Cabeçalho da análise léxica ---
+    printf("===================================================================\n");
+    printf("                        ANALISE LÉXICA\n");
+    printf("===================================================================\n");
+    fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
+    fprintf(yyout, "-------------------------------------------------------------\n");
+
+    // Executa o lexer
+    yyparse();
+
+    // --- Imprime a tabela de símbolos após a análise léxica ---
+    fprintf(yyout, "\nTABELA DE SÍMBOLOS\n");
+    fprintf(yyout, "================================================================");
+    imprimirTabela();  // função que percorre a lista de símbolos
+
+    print_analise_sintatica(); // Imprime a tabela de análise sintática
+    print_analise_semantica(); // Imprime a tabela de análise semântica
+
+    fclose(yyin);
+
+    if (sintatic_error_count > 0 || semantic_error_count > 0) {
+        return 1;
+    }
+    else  {
+        return 0;
+    }
 }
 
 
