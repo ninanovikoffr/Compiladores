@@ -168,8 +168,8 @@ item_declaracao_variavel:
             {
                 addSimbolo($1->lexema, tipoAtual, variavel);
             } else {
-                semanticError("Inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
-                       yylineno, $1->lexema, tipoAtual.type, $3.type);
+                semanticError("inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
+                            $1->lexema, tipoAtual.type, $3.type);
 
                 addSimbolo($1->lexema, tipoAtual, variavel);
             }
@@ -471,6 +471,14 @@ void print_analise_semantica(void) {
     printf("===================================================================\n");
     printf("                        ANALISE SEMANTICA\n");
     printf("===================================================================\n");
+
+    // Evita mensagem de erro semântico em cascata apos recuperacao de erro.
+    if(sintatic_error_count > 0) {
+        printf("Analise semantica nao realizada devido a erros sintaticos.\n");
+        printf("===================================================================\n");
+        return;
+    }
+
     printf("[Lin:Col]\tERRO SEMANTICO\n");
     printf("-------------------------------------------------------------------\n");
 
@@ -604,6 +612,24 @@ void addSimbolo(char* lexema, Ttype tipo, enum CategoriaId categoria){
     envAtual->tabela = novoSimbolo;
 }
 
+void print_analise_lexica(void) {
+    yyout = stdout;
+    printf("\n");
+    printf("===================================================================\n");
+    printf("                        ANALISE LÉXICA\n");
+    printf("===================================================================\n");
+    fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
+    fprintf(yyout, "-------------------------------------------------------------\n");
+
+    // Executa o lexer
+    yyparse();
+
+    // Imprime a tabela de símbolos após a análise léxica
+    fprintf(yyout, "\nTABELA DE SÍMBOLOS\n");
+    fprintf(yyout, "================================================================");
+    imprimirTabela();  // função que percorre a lista de símbolos
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Uso: %s arquivo_entrada\n", argv[0]);
@@ -616,23 +642,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    yyout = stdout;
-
-    // --- Cabeçalho da análise léxica ---
-    printf("===================================================================\n");
-    printf("                        ANALISE LÉXICA\n");
-    printf("===================================================================\n");
-    fprintf(yyout, "%-4s %-4s %-20s %-25s\n", "LIN", "COL", "LEXEMA", "TOKEN");
-    fprintf(yyout, "-------------------------------------------------------------\n");
-
-    // Executa o lexer
-    yyparse();
-
-    // --- Imprime a tabela de símbolos após a análise léxica ---
-    fprintf(yyout, "\nTABELA DE SÍMBOLOS\n");
-    fprintf(yyout, "================================================================");
-    imprimirTabela();  // função que percorre a lista de símbolos
-
+    print_analise_lexica();    // Imprime a tabela de análise léxica
     print_analise_sintatica(); // Imprime a tabela de análise sintática
     print_analise_semantica(); // Imprime a tabela de análise semântica
 

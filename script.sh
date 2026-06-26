@@ -1,1 +1,1 @@
-make &&  ./output/saida tests/teste_parser.txt
+make &&  ./output/saida tests/teste_sintatico.txt

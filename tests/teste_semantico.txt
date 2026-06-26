@@ -1,0 +1,44 @@
+// Teste de casos válidos e inválidos para análise semântica
+int $x = 5;
+float $y = 3.14;
+bool $ativo = true;
+
+// Casos válidos
+int $z = $x + 2;
+float $f = $x + $y;   // soma int + float válida
+float $g = $x * $y;   // multiplicação int * float válida
+float $h = $x / $y;   // divisão int / float válida
+float $k = $x - $y;   // subtração int - float válida
+int $m = -$x;         // unário em int válido
+float $n = -$y;       // unário em float válido
+
+// Casos inválidos de inicialização e atribuição
+int $ini_incomp = $y; // inicialização incompatível (float para int)
+$x = $y;              // atribuição incompatível (float para int)
+
+// Erros de operador relacional
+if ($ativo > $x) {
+    print($x);
+}
+
+// Casos inválidos de operações aritméticas
+int $badSum = $x + $ativo;    // soma inválida: int + bool
+float $badMult = $y * $ativo; // multiplicação inválida: float * bool
+float $badDiv = $x / $ativo;  // divisão inválida: int / bool
+int $badSub = $x - $ativo;    // subtração inválida: int - bool
+
+// Caso inválidos de unário
+int $badUnary1 = -true;        // unário inválido em bool
+
+// Instruções de controle sintaticamente válidas
+if ($x > $y) {
+    print($x);
+} else {
+    read($y);
+}
+
+while ($x != 0) {
+    $x = $x - 1;
+}
+
+print("Fim do teste");
