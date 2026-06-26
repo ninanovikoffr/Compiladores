@@ -21,15 +21,22 @@ extern int column_number;
 %code requires {
 
     enum CategoriaId{
-            variavel,
-            funcao,
-            parametro
-        };
+        variavel,
+        funcao,
+        parametro
+    };
 
     typedef struct Ttype {
         char type;
         int width;
     } Ttype;
+
+    typedef struct ParametroFuncao {
+        Ttype ttype;
+        struct ParametroFuncao *prox;
+
+    } ParametroFuncao;
+
 
     typedef struct Simbolo {
         int id;
@@ -37,6 +44,8 @@ extern int column_number;
         int ocorrencias;
         Ttype tipo;
         enum CategoriaId categoria;
+        ParametroFuncao *parametrosFuncao;
+
         struct Simbolo *prox;
         int nivelEnv;
     } Simbolo;
@@ -62,10 +71,12 @@ extern int column_number;
     Ttype tipoAtual;
     Ttype tipoRetornoAtual;
     Simbolo* funcaoAtual;
+    ParametroFuncao* parametroAtual;
 
     void criarEnv();
     void fecharEnv(void);
     void addSimbolo(char *lexema, Ttype tipo, enum CategoriaId categoria);
+    void addParametro(Simbolo *simbolo, Ttype paramTtype);
     Simbolo* usoDoIDEnv(char *lexema);
     Simbolo* buscarSimboloEnv(char *lexema, Env *env);
     Simbolo* buscarSimboloGeral(char *lexema);
@@ -195,7 +206,7 @@ atribuicao:
 declaracao_funcao:
     tipo_dado ID                            { addSimbolo($2->lexema, tipoAtual, funcao); tipoRetornoAtual = tipoAtual; funcaoAtual = buscarSimboloGeral($2->lexema); }
     '('                                     { criarEnv(); } 
-    parametros ')' '{' comandos '}'         { fecharEnv(); }
+    parametros ')' '{' comandos '}'         { fecharEnv();}
 ;  
 
 parametros:
@@ -209,21 +220,47 @@ lista_parametros:
 ;
 
 parametro:
-    tipo_dado ID            { addSimbolo($2->lexema, tipoAtual, parametro); }
+    tipo_dado ID            { addSimbolo($2->lexema, tipoAtual, parametro); addParametro(funcaoAtual, tipoAtual); }
 ;
 
 chamada_funcao:
-    ID '(' argumentos ')'
+    ID                  { Simbolo *jaExiste = usoDoIDEnv($1->lexema); 
+                            if (jaExiste != NULL && jaExiste->categoria == funcao){
+                                funcaoAtual = jaExiste;
+                            } else {
+                                funcaoAtual = NULL;
+                            } 
+                        }
+    '('                 { parametroAtual = (funcaoAtual != NULL) ? funcaoAtual->parametrosFuncao : NULL; }
+    argumentos ')'
 ;
 
 argumentos:
     lista_argumentos
-    | /* vazio */
+    | /* vazio */           { if (funcaoAtual != NULL && parametroAtual != NULL)
+                                semanticError("A funcao '%s' nao recebe parametros", funcaoAtual->lexema);
+                            }
 ;
 
 lista_argumentos:
-    lista_argumentos ',' expressao
-    | expressao
+    lista_argumentos ',' expressao      { if (parametroAtual == NULL) {
+                                                semanticError("Parametros imcompativeis para a funcao '%s'", funcaoAtual != NULL ? funcaoAtual->lexema : "<desconhecida>");
+                                            } else {
+                                                if (!(parametroAtual->ttype.type == $3.type ||
+                                                        (parametroAtual->ttype.type == 'f' && $3.type == 'i')))
+                                                    semanticError("Parametros imcompativeis para a funcao '%s'", funcaoAtual != NULL ? funcaoAtual->lexema : "<desconhecida>");
+                                                parametroAtual = parametroAtual->prox;
+                                            }
+                                        }
+    | expressao                         { if (parametroAtual == NULL) {
+                                                semanticError("Parametros imcompativeis para a funcao '%s'", funcaoAtual != NULL ? funcaoAtual->lexema : "<desconhecida>");
+                                            } else {
+                                                if (!(parametroAtual->ttype.type == $1.type ||
+                                                        (parametroAtual->ttype.type == 'f' && $1.type == 'i')))
+                                                    semanticError("Parametros imcompativeis para a funcao '%s'", funcaoAtual != NULL ? funcaoAtual->lexema : "<desconhecida>");
+                                                parametroAtual = parametroAtual->prox;
+                                            }
+                                        }
 ;
 
 bloco:
@@ -273,12 +310,12 @@ comando_retorno:
     PR_RETURN expressao {
         if (tipoRetornoAtual.type != $2.type)
             semanticError("Retorno da funcao incompativel. A funcao '%s' e tipo %c, mas o retorno e do tipo %c.",
-                funcaoAtual->lexema, tipoRetornoAtual.type, $2.type);
+                funcaoAtual != NULL ? funcaoAtual->lexema : "<desconhecida>", tipoRetornoAtual.type, $2.type);
         }
     ';'
     | PR_RETURN ';' {
-        semanticError("Retorno sem valor na funcao , que e do tipo %c.",
-            funcaoAtual->lexema,  tipoRetornoAtual.type);
+        semanticError("Retorno sem valor na funcao '%s', que e do tipo %c.",
+            funcaoAtual != NULL ? funcaoAtual->lexema : "<desconhecida>",  tipoRetornoAtual.type);
     }
 ;
 
@@ -605,10 +642,32 @@ void addSimbolo(char* lexema, Ttype tipo, enum CategoriaId categoria){
     novoSimbolo->tipo = tipo;
     novoSimbolo->categoria = categoria;
     novoSimbolo->ocorrencias = 0;
+    novoSimbolo->parametrosFuncao = NULL;
     novoSimbolo->nivelEnv = envAtual->nivel;
     novoSimbolo->prox = envAtual->tabela;
 
     envAtual->tabela = novoSimbolo;
+}
+
+void addParametro(Simbolo* simbolo, Ttype paramTtype){
+    if (simbolo == NULL) {
+        semanticError("Erro interno: tentativa de adicionar parametro em funcao inexistente.");
+        return;
+    }
+    ParametroFuncao *novoParam = (ParametroFuncao*) malloc(sizeof(ParametroFuncao));    
+    novoParam->ttype = paramTtype;
+    novoParam->prox = NULL;
+
+    if (simbolo->parametrosFuncao == NULL) {
+        simbolo->parametrosFuncao = novoParam;
+    } else {
+        ParametroFuncao *atual = simbolo->parametrosFuncao;
+
+        while (atual->prox != NULL) {
+            atual = atual->prox;
+        }
+        atual->prox = novoParam;
+    }
 }
 
 void print_analise_lexica(void) {
