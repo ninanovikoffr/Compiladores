@@ -524,6 +524,7 @@ void criarEnv(){
 
     if (novoEnv == NULL){
         //Lança erro
+        return;
     }
             
     novoEnv->prev = envAtual;
@@ -591,10 +592,22 @@ Simbolo* buscarSimboloGeral(char* lexema){ //Procura em todos os envs
 
 void addSimbolo(char* lexema, Ttype tipo, enum CategoriaId categoria){
 
-    if (buscarSimboloEnv(lexema, envAtual) != NULL){
-        //Erro de redeclaracao de variavel -------------- A CRIAR FUNCAO
+    if (envAtual == NULL){
+        semanticError("tentativa de adicionar simbolo '%s' sem escopo ativo.", lexema);
+        return;
     }
+
+    if (buscarSimboloEnv(lexema, envAtual) != NULL){
+        semanticError("identificador '%s' ja declarado neste escopo.", lexema);
+        return;
+    }
+
     Simbolo *novoSimbolo = (Simbolo*) malloc(sizeof(Simbolo));
+
+    if (novoSimbolo == NULL){
+        semanticError("erro de alocacao de memoria para simbolo '%s'.", lexema);
+        return;
+    }
 
     novoSimbolo->id = proxIdSimbolo++;
     strcpy(novoSimbolo->lexema, lexema);    
@@ -643,9 +656,11 @@ int main(int argc, char *argv[]) {
     fclose(yyin);
 
     if (sintatic_error_count > 0 || semantic_error_count > 0) {
+        printf("\nCompilação com ERRO(S).\n");
         return 1;
     }
     else  {
+        printf("\nCompilação concluída com SUCESSO.\n");
         return 0;
     }
 }
