@@ -66,12 +66,9 @@ invalido			    .
 "print"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_PRINT"); column_number += yyleng; return PR_PRINT; }
 "read"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_READ"); column_number += yyleng; return PR_READ; }
 "return"				{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_RETURN"); column_number += yyleng; return PR_RETURN; }
-"true"		    		{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_TRUE"); column_number += yyleng; return PR_TRUE; }
-"false"	    			{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "PR_FALSE"); column_number += yyleng; return PR_FALSE; }
 
 "int"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TD_INTEGER"); column_number += yyleng; return TD_INTEGER; }
 "float"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TD_FLOAT"); column_number += yyleng; return TD_FLOAT; }
-"bool"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "TD_BOOL"); column_number += yyleng; return TD_BOOL; }
 
 "="                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OP_ATRIBUICAO"); column_number += yyleng; return OP_ATRIBUICAO; }
 

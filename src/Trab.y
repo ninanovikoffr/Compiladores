@@ -84,7 +84,6 @@ extern int column_number;
 
 %token TD_INTEGER "int"
 %token TD_FLOAT "float"
-%token TD_BOOL "bool"
 
 %token PR_IF "if"
 %right OPEN_IF /* Correção etapa2: uso de precedência para dangling else */
@@ -93,8 +92,6 @@ extern int column_number;
 %token PR_PRINT "print"
 %token PR_READ "read"
 %token PR_RETURN "return"
-%token PR_TRUE "true"
-%token PR_FALSE "false"
 
 %token OA_PLUS "+"
 %token OA_MINUS "-"
@@ -149,7 +146,6 @@ elemento:
 tipo_dado:
     TD_INTEGER      {$$.type = 'i'; $$.width = 4; tipoAtual = $$;}
     | TD_FLOAT      {$$.type = 'f'; $$.width = 8; tipoAtual = $$;}
-    | TD_BOOL       {$$.type = 'b'; $$.width = 1; tipoAtual = $$;}
 ;
 
 declaracao_variavel:
@@ -232,8 +228,8 @@ bloco:
 comandos:
     /* vazio */
     | comandos comando
-    | comandos error ';' { yyerrok; /* Recuperação de erro em instruções com ponto e vírgula */ }
-    | comandos error '}' { yyerrok; /* Recuperação de erro em fechamentos de blocos estruturados */ }
+    | comandos error ';' { yyerrok; } // Recuperação de erro em instruções com ponto e vírgula 
+    | comandos error '}' { yyerrok; } // Recuperação de erro em fechamentos de blocos estruturados 
 ;
 
 comando:
@@ -276,27 +272,27 @@ expressao:
 ;
 
 expressao_ou:
-    expressao_ou OL_OR expressao_e { $$.type = 'b'; $$.width = 1; }
+    expressao_ou OL_OR expressao_e {$$.type = 'i'; $$.width = 4;}
     | expressao_e { $$ = $1; }
 ;
 
 expressao_e:
-    expressao_e OL_AND expressao_not { $$.type = 'b'; $$.width = 1; }
+    expressao_e OL_AND expressao_not {$$.type = 'i'; $$.width = 4;}
     | expressao_not { $$ = $1; }
 ;
 
 expressao_not:
-    OL_NOT expressao_relacional { $$.type = 'b'; $$.width = 1; }
+    OL_NOT expressao_relacional {$$.type = 'i'; $$.width = 4;}
     | expressao_relacional { $$ = $1; }
 ;
 
 expressao_relacional:
     expressao_aritmetica operador_relacional expressao_aritmetica {
             if (($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')) {
-                $$.type = 'b'; $$.width = 1;
+                $$.type = 'i'; $$.width = 4; 
             } else {
                 semanticError("operador relacional exige int ou float.");
-                $$.type = 'b'; $$.width = 1;
+                $$.type = 'i'; $$.width = 4;
             }
         }
     | expressao_aritmetica  { $$ = $1; }
@@ -399,8 +395,6 @@ expressao_fator:
     | NUMERO_INT        {$$.type = 'i'; $$.width = 4;}
     | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;}
     //| LITERAL           {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} 
-    | PR_TRUE           {$$.type = 'b'; $$.width = 1;}
-    | PR_FALSE          {$$.type = 'b'; $$.width = 1;}
     | OA_MINUS expressao_fator     {
                             if ($2.type == 'i' || $2.type == 'f') {
                                 $$ = $2;
