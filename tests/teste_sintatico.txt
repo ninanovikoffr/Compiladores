@@ -2,7 +2,7 @@
 
 int $x = -5;
 float $y = 3.14;
-bool $ativo = true;
+int $ativo = 1;
 
 int $soma(int $a, int $b) {
     int $resultado;
@@ -10,11 +10,11 @@ int $soma(int $a, int $b) {
     return $resultado;
 }
 
-bool $maiorQueZero(int $n) {
+int $maiorQueZero(int $n) {
     if ($n > 0)
-        return true;
+        return 1;
     else
-        return false;
+        return 0;
 }
 
 $x = $soma(2, 3);
@@ -92,9 +92,9 @@ while () {
 // Esperava-se uma expressão entre as vírgulas.
 $y = $soma(2, , 3);
 
-// 8. Uso de palavra reservada no lugar errado
-// 'true' é um valor booleano, não pode ser usado como nome de variável.
-int true = 5;
+// 8. Falta de identificador em declaração
+// O parser espera um identificador após o tipo.
+int = 5;
 
 // 9. Esquecer de abrir a chave num bloco de função
 // O parser espera '{' após a assinatura da função.
