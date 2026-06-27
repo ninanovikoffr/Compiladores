@@ -30,15 +30,9 @@ int $soma(int $a, int $b) {
     return $a + $b;
 }
 
-read($soma);
-
-read($naoExiste);
-
 int $f(int $x) {
     read($x);
     return $x;
 }
 
 $x = 10;
-
-$soma = 10;

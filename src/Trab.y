@@ -29,6 +29,7 @@ extern int column_number;
     typedef struct Ttype {
         char type;
         int width;
+        char addr[100];
     } Ttype;
 
     typedef struct ParametroFuncao {
@@ -110,8 +111,8 @@ extern int column_number;
 
 /* Associação dos tokens a versões em português */
 %token <simbolo> ID "identificador"
-%token NUMERO_INT "numero inteiro"
-%token NUMERO_FLOAT "numero float"
+%token <inteiro> NUMERO_INT "numero inteiro"
+%token <pontoFlutante> NUMERO_FLOAT "numero float"
 %token LITERAL "literal"
 
 %token TD_INTEGER "int"
@@ -178,8 +179,8 @@ elemento:
 ;
 
 tipo_dado:
-    TD_INTEGER      {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} 
-    | TD_FLOAT      {$$.type = 'f'; $$.width = 8; tipoAtual = $$;}
+    TD_INTEGER      {$$.type = 'i';$$.width = 4; $$.addr[0] = '\0'; tipoAtual = $$;} 
+    | TD_FLOAT      {$$.type = 'f'; $$.width = 8; $$.addr[0] = '\0'; tipoAtual = $$;}
 ;
 
 declaracao_variavel:
@@ -519,21 +520,21 @@ expressao_termo:
 expressao_fator:
     '(' expressao ')'   {$$ = $2;}
     | chamada_funcao    {$$ = $1;}
-    | ID                {Simbolo *jaExiste = usoDoIDEnv($1->lexema); 
-                            if (jaExiste != NULL){
-                                if (jaExiste->categoria == funcao) {
-                                    semanticError("identificador '%s' e uma funcao, nao pode ser usado como variavel.", $1->lexema);
-                                    $$.type = 'i'; $$.width = 4;
-                                } else {
-                                    $$ = jaExiste->tipo;
-                                }
-                            } 
-                            else {
-                                $$.type = 'i'; $$.width = 4; //valor seguro pro parser continuar
-                            }
-                        }
-    | NUMERO_INT        {$$.type = 'i'; $$.width = 4;}
-    | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;} 
+    | ID                {
+        Simbolo *jaExiste = usoDoIDEnv($1->lexema); 
+        if (jaExiste != NULL){
+            semanticError("identificador '%s' e uma funcao, nao pode ser usado como variavel.", $1->lexema);
+            $$ = jaExiste->tipo;
+            strcpy($$.addr, $1->lexema);
+        } 
+        else {
+            $$.type = 'i';
+            $$.width = 4; 
+            strcpy($$.addr, "0"); //valor seguro pro parser continuar
+        }
+    }
+    | NUMERO_INT        {$$.type = 'i'; $$.width = 4; snprintf($$.addr, sizeof($$.addr), "%d", $1);}
+    | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8; snprintf($$.addr, sizeof($$.addr), "%f", $1);} 
     | OA_MINUS expressao_fator     {
                             if ($2.type == 'i' || $2.type == 'f') {
                                 $$ = $2;
@@ -698,12 +699,50 @@ void espacoCodigo(size_t caracteres){
     }
 }
 
+void gen(const char *formato, ...) {
+    char linha[1024];
+
+    va_list args;
+    va_start(args, formato);
+    vsnprintf(linha, sizeof(linha), formato, args);
+    va_end(args);
+
+    espacoCodigo(strlen(linha) + 2);
+
+    strcat(codInterm, linha);
+    strcat(codInterm, "\n");
+
+    tamCodInterm += strlen(linha) + 1;
+}
+
+void print_codigo_intermediario(void) {
+    printf("\n");
+    printf("===================================================================\n");
+    printf("                    CODIGO INTERMEDIARIO\n");
+    printf("===================================================================\n");
+
+    if (sintatic_error_count > 0 || semantic_error_count > 0) {
+        printf("Codigo intermediario nao gerado devido a erros anteriores.\n");
+        printf("===================================================================\n");
+        return;
+    }
+
+    if (codInterm == NULL || tamCodInterm == 0) {
+        printf("Nenhuma instrucao de IR gerada.\n");
+    } else {
+        printf("%s", codInterm);
+    }
+
+    printf("===================================================================\n");
+}
+
 int eNumerico(Ttype tipo) {
     return (tipo.type == 'i' || tipo.type == 'f');
 }
 
 Ttype tipoResultante(Ttype tipo1, Ttype tipo2, const char *operador) {
     Ttype resultado;
+    resultado.addr[0] = '\0'; // Inicializa o endereço como uma string vazia
 
     if (!eNumerico(tipo1) || !eNumerico(tipo2)) {
         semanticError("operador aritmetico '%s' exige operandos int ou float.", operador);
@@ -908,9 +947,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    print_analise_lexica();    // Imprime a tabela de análise léxica
-    print_analise_sintatica(); // Imprime a tabela de análise sintática
-    print_analise_semantica(); // Imprime a tabela de análise semântica
+    print_analise_lexica();       // Imprime a tabela de análise léxica
+    print_analise_sintatica();    // Imprime a tabela de análise sintática
+    print_analise_semantica();    // Imprime a tabela de análise semântica
+    print_codigo_intermediario(); // Imprime o código intermediário
 
     fclose(yyin);
 
