@@ -84,7 +84,7 @@
 * [ ] Gerar IR para `return`
 
 ---
-
+ 
 ## 3. Relatório da Etapa 3
 
 * [ ] Descrever a estrutura da tabela de símbolos
