@@ -226,9 +226,16 @@ atribuicao:
 ;
 
 declaracao_funcao:
-    tipo_dado ID            { addSimbolo($2->lexema, tipoAtual, funcao);
-                            funcaoDeclaracaoAtual = empilharFuncao(funcaoDeclaracaoAtual, buscarSimboloGeral($2->lexema), 1);
-                            tipoRetornoAtual = &funcaoDeclaracaoAtual->simbolo->tipo; }
+    tipo_dado ID            { Simbolo *jaDeclarada = buscarSimboloEnv($2->lexema, envAtual);
+                            if (jaDeclarada != NULL) {
+                                semanticError("identificador '%s' ja declarado neste escopo.", $2->lexema);
+                                funcaoDeclaracaoAtual = empilharFuncao(funcaoDeclaracaoAtual, NULL, 0);
+                                tipoRetornoAtual = NULL;
+                            } else {
+                                addSimbolo($2->lexema, tipoAtual, funcao);
+                                funcaoDeclaracaoAtual = empilharFuncao(funcaoDeclaracaoAtual, buscarSimboloEnv($2->lexema, envAtual), 1);
+                                tipoRetornoAtual = &funcaoDeclaracaoAtual->simbolo->tipo;
+                            } }
     '('                                     { criarEnv(); } 
     parametros ')' '{' comandos '}'         { fecharEnv(); tipoRetornoAtual = NULL; funcaoDeclaracaoAtual = desalocarFuncao(funcaoDeclaracaoAtual); }
 ;  
@@ -244,7 +251,12 @@ lista_parametros:
 ;
 
 parametro:
-    tipo_dado ID            { addSimbolo($2->lexema, tipoAtual, parametro); addParametro(funcaoDeclaracaoAtual, tipoAtual); }
+    tipo_dado ID            { if (buscarSimboloEnv($2->lexema, envAtual) != NULL) {
+                                semanticError("identificador '%s' ja declarado neste escopo.", $2->lexema);
+                            } else {
+                                addSimbolo($2->lexema, tipoAtual, parametro);
+                                addParametro(funcaoDeclaracaoAtual, tipoAtual);
+                            } }
 ;
 
 chamada_funcao:
@@ -507,9 +519,14 @@ expressao_termo:
 expressao_fator:
     '(' expressao ')'   {$$ = $2;}
     | chamada_funcao    {$$ = $1;}
-    | ID                {Simbolo *existeDenovo = usoDoIDEnv($1->lexema); 
-                            if (existeDenovo != NULL){
-                                $$ = existeDenovo->tipo;
+    | ID                {Simbolo *jaExiste = usoDoIDEnv($1->lexema); 
+                            if (jaExiste != NULL){
+                                if (jaExiste->categoria == funcao) {
+                                    semanticError("identificador '%s' e uma funcao, nao pode ser usado como variavel.", $1->lexema);
+                                    $$.type = 'i'; $$.width = 4;
+                                } else {
+                                    $$ = jaExiste->tipo;
+                                }
                             } 
                             else {
                                 $$.type = 'i'; $$.width = 4; //valor seguro pro parser continuar
