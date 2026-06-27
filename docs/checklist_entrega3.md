@@ -67,58 +67,43 @@
 * [x] Criar função para gerar rótulos `L1`, `L2`, `L3`, ...
 * [x] Criar buffer/string para armazenar código intermediário
 * [x] Criar função auxiliar para aumentar espaço do buffer de IR
-* [ ] Criar função para emitir instruções de IR
-* [ ] Criar função para imprimir o código intermediário gerado
-* [ ] Chamar a impressão da IR no `main`
-* [ ] Definir conjunto mínimo de instruções da IR
+* [x] Criar função para emitir instruções de IR
+* [x] Criar função para imprimir o código intermediário gerado
+* [x] Chamar a impressão da IR no `main`
+* [x] Definir conjunto mínimo de instruções da IR
 
 ### Expressões
 
-* [ ] Gerar IR para expressões aritméticas
-* [ ] Gerar IR para expressões relacionais
-* [ ] Gerar IR para expressões lógicas
-* [ ] Gerar IR para operadores unários
-* [ ] Armazenar o temporário resultante de cada expressão
-* [ ] Propagar, junto com o tipo da expressão, o endereço/temporário usado na IR
+* [x] Gerar IR para expressões aritméticas
+* [x] Gerar IR para expressões relacionais
+* [x] Gerar IR para expressões lógicas
+* [x] Gerar IR para operadores unários
+* [x] Armazenar o temporário resultante de cada expressão
+* [x] Propagar, junto com o tipo da expressão, o endereço/temporário usado na IR
 
 ### Atribuições e entrada/saída
 
-* [ ] Gerar IR para atribuição
-* [ ] Gerar IR para inicialização de variável com atribuição
-* [ ] Gerar IR para `print`
-* [ ] Gerar IR para `read`
+* [x] Gerar IR para atribuição
+* [x] Gerar IR para inicialização de variável com atribuição
+* [x] Gerar IR para `print`
+* [x] Gerar IR para `read`
 
 ### Controle de fluxo
 
-* [ ] Gerar IR para `if`
-* [ ] Gerar IR para `if/else`
-* [ ] Gerar IR para `while`
-* [ ] Usar rótulos corretamente em desvios condicionais
-* [ ] Usar `goto` quando necessário
-* [ ] Separar rótulos de início, falso e saída nos comandos de controle
+* [x] Gerar IR para `if`
+* [x] Gerar IR para `if/else`
+* [x] Gerar IR para `while`
+* [x] Usar rótulos corretamente em desvios condicionais
+* [x] Usar `goto` quando necessário
+* [x] Separar rótulos de início, falso e saída nos comandos de controle
 
 ### Funções
 
-* [ ] Gerar IR para início/fim de declaração de função
-* [ ] Gerar IR para parâmetros
-* [ ] Gerar IR para chamada de função
-* [ ] Gerar IR para passagem de argumentos
-* [ ] Gerar IR para receber valor retornado por chamada de função
-* [ ] Gerar IR para `return`
-
----
-
-## 3. Relatório da Etapa 3
-
-* [ ] Descrever a estrutura da tabela de símbolos
-* [ ] Explicar o gerenciamento de escopos
-* [ ] Apresentar tabela de regras de tipagem
-* [ ] Explicar geração de IR para `if/else`
-* [ ] Explicar geração de IR para `while`
-* [ ] Incluir programa de teste
-* [ ] Incluir IR gerado pelo compilador
-* [ ] Apresentar pelo menos uma Tradução Dirigida por Sintaxe
-* [ ] Discutir decisões de projeto
-* [ ] Discutir dificuldades encontradas
+* [x] Gerar IR para início/fim de declaração de função
+* [x] Gerar IR para parâmetros
+* [x] Gerar IR para chamada de função
+* [x] Gerar IR para passagem de argumentos
+* [x] Gerar IR para receber valor retornado por chamada de função
+* [x] Gerar IR para `return`
 
 ---
