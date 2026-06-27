@@ -36,3 +36,12 @@ int $f(int $x) {
 }
 
 $x = 10;
+
+int $a;
+int $b;
+
+$b = 10;
+$a = $b + 2;
+
+print($a);
+print($soma);

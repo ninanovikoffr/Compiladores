@@ -282,9 +282,11 @@ chamada_funcao:
             }
 
             $$ = funcaoChamadaAtual->simbolo->tipo;
+            $$.addr[0] = '\0'; // Inicializa o endereço como uma string vazia
         } else {
             $$.type = 'i';
             $$.width = 4; // setando um tipo só pra anlise continuar
+            strcpy($$.addr, "0"); //valor seguro pro parser continuar
         }
 
         funcaoChamadaAtual = desalocarFuncao(funcaoChamadaAtual);
@@ -523,7 +525,9 @@ expressao_fator:
     | ID                {
         Simbolo *jaExiste = usoDoIDEnv($1->lexema); 
         if (jaExiste != NULL){
-            semanticError("identificador '%s' e uma funcao, nao pode ser usado como variavel.", $1->lexema);
+            if(jaExiste->categoria == funcao){
+                semanticError("identificador '%s' e uma funcao, nao pode ser usado como variavel.", $1->lexema);
+            }
             $$ = jaExiste->tipo;
             strcpy($$.addr, $1->lexema);
         } 
