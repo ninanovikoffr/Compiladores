@@ -113,7 +113,7 @@ extern int column_number;
 %token <simbolo> ID "identificador"
 %token <inteiro> NUMERO_INT "numero inteiro"
 %token <pontoFlutante> NUMERO_FLOAT "numero float"
-%token LITERAL "literal"
+%token <texto> LITERAL "literal"
 
 %token TD_INTEGER "int"
 %token TD_FLOAT "float"
@@ -193,18 +193,20 @@ lista_declaracao_variavel:
 ;
 
 item_declaracao_variavel:
-    ID                           {addSimbolo( $1->lexema, tipoAtual, variavel);}
+    ID {
+        addSimbolo($1->lexema, tipoAtual, variavel);
+    }
     | ID OP_ATRIBUICAO expressao {
-            if (tipoAtual.type == $3.type || (tipoAtual.type == 'f' && $3.type == 'i'))
-            {
-                addSimbolo($1->lexema, tipoAtual, variavel);
-            } else {
-                semanticError("Inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
-                       $1->lexema, tipoAtual.type, $3.type);
+        if (tipoAtual.type == $3.type || (tipoAtual.type == 'f' && $3.type == 'i')) {
+            addSimbolo($1->lexema, tipoAtual, variavel);
+            gen("%s = %s", $1->lexema, $3.addr);
+        } else {
+            semanticError("Inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
+                   $1->lexema, tipoAtual.type, $3.type);
 
-                addSimbolo($1->lexema, tipoAtual, variavel); // Pra continuar a análise
-            }
+            addSimbolo($1->lexema, tipoAtual, variavel); // Pra continuar a análise
         }
+    }
 ;
 
 atribuicao:
@@ -217,7 +219,7 @@ atribuicao:
                     semanticError("identificador '%s' e uma funcao, nao pode ser usado em atribuicao.", $1->lexema);
                 } else {
                     if (existeS->tipo.type == $3.type || (existeS->tipo.type == 'f' && $3.type == 'i')) {
-                        //ainda nao precisa fazer nada
+                        gen("%s = %s", $1->lexema, $3.addr);
                     } else {
                         semanticError("atribuicao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.", $1->lexema, existeS->tipo.type, $3.type);
                     }
@@ -380,20 +382,28 @@ comando_repeticao:
 ;
 
 comando_saida:
-    PR_PRINT '(' expressao ')' ';'
-    | PR_PRINT '(' LITERAL ')' ';'
+    PR_PRINT '(' expressao ')' ';' {
+        gen("print %s", $3.addr);
+    }
+    | PR_PRINT '(' LITERAL ')' ';' {
+        gen("print %s", $3);
+        free($3);
+    }
 ;
 
 comando_entrada:
-    PR_READ '(' ID ')' ';'{
+    PR_READ '(' ID ')' ';' {
         Simbolo *s = usoDoIDEnv($3->lexema);
-        if (s != NULL){
-            if (s->categoria == funcao){
+
+        if (s != NULL) {
+            if (s->categoria == funcao) {
                 semanticError("identificador '%s' e uma funcao, nao pode ser usado em read.", $3->lexema);
+            } else {
+                gen("read %s", $3->lexema);
             }
         }
     }
-; 
+;
 
 comando_retorno:
     PR_RETURN expressao {
