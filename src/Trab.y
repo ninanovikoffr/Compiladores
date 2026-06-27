@@ -83,7 +83,7 @@ extern int column_number;
 
     char* newTemp(void);
     char* newLabel(void);
-    void espacoCodigo(size_t caracteres)
+    void espacoCodigo(size_t caracteres);
     void gen(const char *formato, ...);
     void print_codigo_intermediario(void);
 
