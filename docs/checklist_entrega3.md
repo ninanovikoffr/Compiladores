@@ -33,7 +33,7 @@
 * [-] Verificar chamadas de função
 * [-] Verificar quantidade de argumentos em funções
 * [-] Verificar tipos dos argumentos em funções
-* [-] Verificar tipo de retorno das funções
+* [x] Verificar tipo de retorno das funções
 
 ### Erros semânticos
 
