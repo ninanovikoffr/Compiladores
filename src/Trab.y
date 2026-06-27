@@ -491,9 +491,19 @@ operador_relacional:
 expressao_aritmetica:
     expressao_aritmetica OA_PLUS expressao_termo {
         $$ = tipoResultante($1, $3, "+");
+
+        char *temp = newTemp();
+        gen("%s = %s + %s", temp, $1.addr, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
     | expressao_aritmetica OA_MINUS expressao_termo {
         $$ = tipoResultante($1, $3, "-");
+
+        char *temp = newTemp();
+        gen("%s = %s - %s", temp, $1.addr, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
     | expressao_termo {
         $$ = $1;
@@ -503,19 +513,38 @@ expressao_aritmetica:
 expressao_termo:
     expressao_termo OA_MULT expressao_fator {
         $$ = tipoResultante($1, $3, "*");
+
+        char *temp = newTemp();
+        gen("%s = %s * %s", temp, $1.addr, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
     | expressao_termo OA_DIV expressao_fator {
         $$ = tipoResultante($1, $3, "/");
+
+        char *temp = newTemp();
+        gen("%s = %s / %s", temp, $1.addr, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
     | expressao_termo OA_MOD expressao_fator {
         if ($1.type == 'i' && $3.type == 'i') {
-            $$.type = 'i'; $$.width = 4;
+            $$.type = 'i';
+            $$.width = 4;
         } else {
             semanticError("operador '%%' exige operandos int.");
-            $$.type = 'i'; $$.width = 4;
+            $$.type = 'i';
+            $$.width = 4;
         }
+
+        char *temp = newTemp();
+        gen("%s = %s %% %s", temp, $1.addr, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
-    | expressao_fator { $$ = $1; }
+    | expressao_fator {
+        $$ = $1;
+    }
 ;
 
 
@@ -539,14 +568,22 @@ expressao_fator:
     }
     | NUMERO_INT        {$$.type = 'i'; $$.width = 4; snprintf($$.addr, sizeof($$.addr), "%d", $1);}
     | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8; snprintf($$.addr, sizeof($$.addr), "%f", $1);} 
-    | OA_MINUS expressao_fator     {
-                            if ($2.type == 'i' || $2.type == 'f') {
-                                $$ = $2;
-                            } else {
-                                semanticError("operador - unario exige int ou float.");
-                                $$.type = 'i'; $$.width = 4;
-                            }
-                        }
+    | OA_MINUS expressao_fator {
+        if ($2.type == 'i' || $2.type == 'f') {
+            $$.type = $2.type;
+            $$.width = $2.width;
+
+            char *temp = newTemp();
+            gen("%s = - %s", temp, $2.addr);
+            strcpy($$.addr, temp);
+            free(temp);
+        } else {
+            semanticError("operador - unario exige int ou float.");
+            $$.type = 'i';
+            $$.width = 4;
+            strcpy($$.addr, "0");
+        }
+    }   
 ;
 
 %%

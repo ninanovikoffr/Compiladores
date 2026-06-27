@@ -26,8 +26,8 @@ if ($x > 0)
 if ($x && $y)
     print($x);
 
-int $soma(int $a, int $b) {
-    return $a + $b;
+int $soma(int $i, int $j) {
+    return $i + $j;
 }
 
 int $f(int $x) {
@@ -41,7 +41,6 @@ int $a;
 int $b;
 
 $b = 10;
-$a = $b + 2;
+$a = $b + 2 * 3;
 
 print($a);
-print($soma);
