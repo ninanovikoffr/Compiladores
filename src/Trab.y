@@ -264,7 +264,7 @@ chamada_funcao:
     argumentos ')'      {
         if (funcaoAtualValida()) {
             if (funcaoAtual->parametroAtual != NULL) {
-                semanticError("Quantidade insuficiente de argumentos na chamada da funcao '%s'.", funcaoAtual->simbolo->lexema);
+                semanticError("quantidade insuficiente de argumentos na chamada da funcao '%s'.", funcaoAtual->simbolo->lexema);
             }
 
             $$ = funcaoAtual->simbolo->tipo;
@@ -291,11 +291,11 @@ argumentos:
 lista_argumentos:
     lista_argumentos ',' expressao      { if (funcaoAtualValida()) {
                                                 if (funcaoAtual->parametroAtual == NULL) {
-                                                    semanticError("Argumento extra na chamada da funcao '%s'", funcaoAtual->simbolo->lexema);
+                                                    semanticError("argumento extra na chamada da funcao '%s'", funcaoAtual->simbolo->lexema);
                                                 } else {
                                                     if (!(funcaoAtual->parametroAtual->ttype.type == $3.type ||
                                                             (funcaoAtual->parametroAtual->ttype.type == 'f' && $3.type == 'i')))
-                                                        semanticError("Parametros imcompativeis para a funcao '%s'", funcaoAtual->simbolo->lexema);
+                                                        semanticError("parametros imcompativeis para a funcao '%s'", funcaoAtual->simbolo->lexema);
                                                     funcaoAtual->parametroAtual = funcaoAtual->parametroAtual->prox;
                                                 }
                                             }
@@ -303,14 +303,14 @@ lista_argumentos:
     | expressao                         { if (funcaoAtualValida()) {
                                                 if (funcaoAtual->parametroAtual == NULL) {
                                                     if (funcaoAtual->simbolo->parametrosFuncao == NULL) {
-                                                        semanticError("A funcao '%s' nao recebe parametros.",funcaoAtual->simbolo->lexema);
+                                                        semanticError("a funcao '%s' nao recebe parametros.",funcaoAtual->simbolo->lexema);
                                                     } else {
-                                                        semanticError("Argumento extra na chamada da funcao '%s'.", funcaoAtual->simbolo->lexema);
+                                                        semanticError("argumento extra na chamada da funcao '%s'.", funcaoAtual->simbolo->lexema);
                                                     }
                                                 } else {
                                                     if (!(funcaoAtual->parametroAtual->ttype.type == $1.type ||
                                                             (funcaoAtual->parametroAtual->ttype.type == 'f' && $1.type == 'i')))
-                                                        semanticError("Parametros imcompativeis para a funcao '%s'", funcaoAtual->simbolo->lexema);
+                                                        semanticError("parametros imcompativeis para a funcao '%s'", funcaoAtual->simbolo->lexema);
                                                     funcaoAtual->parametroAtual = funcaoAtual->parametroAtual->prox;
                                                 }
                                             }
@@ -384,10 +384,11 @@ comando_retorno:
         if (tipoRetornoAtual == NULL || !funcaoAtualValida()) {
         semanticError("Return fora de uma funcao.");
         }
-        else if (!(tipoRetornoAtual->type != $2.type || (tipoRetornoAtual->type == 'f' && $2.type == 'i')))
+        else if (!(tipoRetornoAtual->type == $2.type || (tipoRetornoAtual->type == 'f' && $2.type == 'i'))) {
             semanticError("Retorno da funcao incompativel. A funcao '%s' e tipo %c, mas o retorno e do tipo %c.",
                 funcaoAtual->simbolo->lexema, tipoRetornoAtual->type, $2.type);
         }
+    }
     ';'
     | PR_RETURN ';' {
         if (tipoRetornoAtual == NULL || !funcaoAtualValida()) {
