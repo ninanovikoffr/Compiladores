@@ -70,11 +70,17 @@ extern int column_number;
     Simbolo* buscarSimboloEnv(char *lexema, Env *env);
     Simbolo* buscarSimboloGeral(char *lexema);
 
+    char* newTemp(void);
+    char* newLabel(void);
+    void espacoCodigo(size_t caracteres)
+    void gen(const char *formato, ...);
+    void print_codigo_intermediario(void);
+
     void semanticError(const char *formato, ...);
     void print_analise_semantica(void);
 
-    int isNumeric(Ttype tipo);
-    Ttype tipoAritmeticoResultante(Ttype tipo1, Ttype tipo2, const char *operador);
+    int eNumerico(Ttype tipo);
+    Ttype tipoResultante(Ttype tipo1, Ttype tipo2, const char *operador);
 }
 
 
@@ -102,6 +108,7 @@ extern int column_number;
 %token OA_MINUS "-"
 %token OA_MULT "*"
 %token OA_DIV "/"
+%token OA_MOD "%"
 %token OR_LT "<"
 %token OR_GT ">"
 %token OR_EQ "=="
@@ -324,10 +331,10 @@ operador_relacional:
 
 expressao_aritmetica:
     expressao_aritmetica OA_PLUS expressao_termo {
-        $$ = tipoAritmeticoResultante($1, $3, "+");
+        $$ = tipoResultante($1, $3, "+");
     }
     | expressao_aritmetica OA_MINUS expressao_termo {
-        $$ = tipoAritmeticoResultante($1, $3, "-");
+        $$ = tipoResultante($1, $3, "-");
     }
     | expressao_termo {
         $$ = $1;
@@ -336,10 +343,18 @@ expressao_aritmetica:
 
 expressao_termo:
     expressao_termo OA_MULT expressao_fator {
-        $$ = tipoAritmeticoResultante($1, $3, "*");
+        $$ = tipoResultante($1, $3, "*");
     }
     | expressao_termo OA_DIV expressao_fator {
-        $$ = tipoAritmeticoResultante($1, $3, "/");
+        $$ = tipoResultante($1, $3, "/");
+    }
+    | expressao_termo OA_MOD expressao_fator {
+        if ($1.type == 'i' && $3.type == 'i') {
+            $$.type = 'i'; $$.width = 4;
+        } else {
+            semanticError("operador '%%' exige operandos int.");
+            $$.type = 'i'; $$.width = 4;
+        }
     }
     | expressao_fator { $$ = $1; }
 ;
@@ -353,20 +368,17 @@ expressao_fator:
                                 $$ = existeDenovo->tipo;
                             } 
                             else {
-                                $$.type = 'i';
-                                $$.width = 4; //valor seguro pro parser continuar
+                                $$.type = 'i'; $$.width = 4; //valor seguro pro parser continuar
                             }
                         }
     | NUMERO_INT        {$$.type = 'i'; $$.width = 4;}
-    | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;}
-    //| LITERAL           {$$.type = 'i'; $$.width = 4; tipoAtual = $$;} 
+    | NUMERO_FLOAT      {$$.type = 'f'; $$.width = 8;} 
     | OA_MINUS expressao_fator     {
                             if ($2.type == 'i' || $2.type == 'f') {
                                 $$ = $2;
                             } else {
                                 semanticError("operador - unario exige int ou float.");
-                                $$.type = 'i';
-                                $$.width = 4;
+                                $$.type = 'i'; $$.width = 4;
                             }
                         }
 ;
@@ -376,9 +388,16 @@ expressao_fator:
 extern FILE *yyin;
 extern FILE *yyout;
 
+int temp_cont = 1;
+int label_cont = 1;
+
+char *codInterm = NULL;
+size_t capCodInterm = 0;
+size_t tamCodInterm = 0;
+
 void imprimirTabela(void);
 
-/* Funcao para imprimir tabela de analise sintatica */
+// Funcao para imprimir tabela de analise sintatica 
 void print_analise_sintatica(void) {
     printf("\n");
     printf("===================================================================\n");
@@ -481,14 +500,51 @@ void semanticError(const char *formato, ...) {
     semantic_error_count++;
 }
 
-int isNumeric(Ttype tipo) {
+char* newTemp(void) {
+    char *temp = malloc(20);
+
+    sprintf(temp, "t%d", temp_cont);
+    temp_cont++;
+
+    return temp;
+}
+
+char* newLabel(void) {
+    char *label = malloc(20);
+
+    sprintf(label, "L%d", label_cont);
+    label_cont++;
+
+    return label;
+}
+
+void espacoCodigo(size_t caracteres){
+    if (codInterm == NULL) {
+        capCodInterm = 4096;
+        tamCodInterm = 0;
+
+        codInterm = malloc(capCodInterm);
+
+        codInterm[0] = '\0'; //começa vazio
+    }
+
+    while (tamCodInterm + caracteres + 1 > capCodInterm) {
+        capCodInterm += 4096;
+
+        char *novo = realloc(codInterm, capCodInterm);
+        codInterm = novo;
+
+    }
+}
+
+int eNumerico(Ttype tipo) {
     return (tipo.type == 'i' || tipo.type == 'f');
 }
 
-Ttype tipoAritmeticoResultante(Ttype tipo1, Ttype tipo2, const char *operador) {
+Ttype tipoResultante(Ttype tipo1, Ttype tipo2, const char *operador) {
     Ttype resultado;
 
-    if (!isNumeric(tipo1) || !isNumeric(tipo2)) {
+    if (!eNumerico(tipo1) || !eNumerico(tipo2)) {
         semanticError("operador aritmetico '%s' exige operandos int ou float.", operador);
 
         resultado.type = 'i';

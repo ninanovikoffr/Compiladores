@@ -55,6 +55,7 @@ invalido			    .
 "-"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_MINUS"); column_number += yyleng; return OA_MINUS; }
 "*"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_MULT"); column_number += yyleng; return OA_MULT; }
 "/"						{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_DIV"); column_number += yyleng; return OA_DIV; }
+"%"                     { fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OA_MOD"); column_number += yyleng; return OA_MOD; }
 
 "&&"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OL_AND"); column_number += yyleng; return OL_AND; }
 "||"					{ fprintf(yyout, "%-4d %-4d %-20s %-25s\n", yylineno, column_number, yytext, "OL_OR"); column_number += yyleng; return OL_OR; }
