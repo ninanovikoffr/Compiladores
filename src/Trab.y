@@ -62,6 +62,7 @@ extern int column_number;
         ParametroFuncao* parametroAtual;
         struct Funcao* funcaoAnterior;
         int valida;
+        int qtdArgumentos;
     } Funcao;
 
 }
@@ -232,18 +233,32 @@ atribuicao:
 ;
 
 declaracao_funcao:
-    tipo_dado ID            { Simbolo *jaDeclarada = buscarSimboloEnv($2->lexema, envAtual);
-                            if (jaDeclarada != NULL) {
-                                semanticError("identificador '%s' ja declarado neste escopo.", $2->lexema);
-                                funcaoDeclaracaoAtual = empilharFuncao(funcaoDeclaracaoAtual, NULL, 0);
-                                tipoRetornoAtual = NULL;
-                            } else {
-                                addSimbolo($2->lexema, tipoAtual, funcao);
-                                funcaoDeclaracaoAtual = empilharFuncao(funcaoDeclaracaoAtual, buscarSimboloEnv($2->lexema, envAtual), 1);
-                                tipoRetornoAtual = &funcaoDeclaracaoAtual->simbolo->tipo;
-                            } }
+    tipo_dado ID    { 
+        Simbolo *jaDeclarada = buscarSimboloEnv($2->lexema, envAtual);
+        if (jaDeclarada != NULL) {
+            semanticError("identificador '%s' ja declarado neste escopo.", $2->lexema);
+            funcaoDeclaracaoAtual = empilharFuncao(funcaoDeclaracaoAtual, NULL, 0);
+            tipoRetornoAtual = NULL;
+        } else {
+            addSimbolo($2->lexema, tipoAtual, funcao);
+            funcaoDeclaracaoAtual = empilharFuncao(funcaoDeclaracaoAtual, buscarSimboloEnv($2->lexema, envAtual), 1);
+            tipoRetornoAtual = &funcaoDeclaracaoAtual->simbolo->tipo;
+
+            gen("func %s:", $2->lexema);
+        }
+    }
+
     '('                                     { criarEnv(); } 
-    parametros ')' '{' comandos '}'         { fecharEnv(); tipoRetornoAtual = NULL; funcaoDeclaracaoAtual = desalocarFuncao(funcaoDeclaracaoAtual); }
+
+    parametros ')' '{' comandos '}' {
+        if (funcaoValida(funcaoDeclaracaoAtual)) {
+            gen("end func %s", funcaoDeclaracaoAtual->simbolo->lexema);
+        }
+
+        fecharEnv();
+        tipoRetornoAtual = NULL;
+        funcaoDeclaracaoAtual = desalocarFuncao(funcaoDeclaracaoAtual);
+    }
 ;  
 
 parametros:
@@ -266,32 +281,38 @@ parametro:
 ;
 
 chamada_funcao:
-    ID                  { Simbolo *jaExiste = usoDoIDEnv($1->lexema); 
-                             if (jaExiste != NULL && jaExiste->categoria == funcao) {
-                                funcaoChamadaAtual = empilharFuncao(funcaoChamadaAtual, jaExiste, 1);
-                            } else {
-                                if (jaExiste != NULL) {
-                                    semanticError("Identificador '%s' nao e uma funcao.", $1->lexema);
-                                }
-                                funcaoChamadaAtual = empilharFuncao(funcaoChamadaAtual, jaExiste, 0);
-                            }
-                        }
-    '('                 {
-                        if (funcaoValida(funcaoChamadaAtual))
-                            funcaoChamadaAtual->parametroAtual = funcaoChamadaAtual->simbolo->parametrosFuncao;
-                        }
-    argumentos ')'      {
+    ID  { 
+        Simbolo *jaExiste = usoDoIDEnv($1->lexema); 
+        if (jaExiste != NULL && jaExiste->categoria == funcao) {
+            funcaoChamadaAtual = empilharFuncao(funcaoChamadaAtual, jaExiste, 1);
+        } else {
+            if (jaExiste != NULL) {
+                semanticError("Identificador '%s' nao e uma funcao.", $1->lexema);
+            }
+            funcaoChamadaAtual = empilharFuncao(funcaoChamadaAtual, jaExiste, 0);
+        }
+    }
+    '(' {
+        if (funcaoValida(funcaoChamadaAtual))
+            funcaoChamadaAtual->parametroAtual = funcaoChamadaAtual->simbolo->parametrosFuncao;
+    }
+
+    argumentos ')'  {
         if (funcaoValida(funcaoChamadaAtual)) {
             if (funcaoChamadaAtual->parametroAtual != NULL) {
                 semanticError("quantidade insuficiente de argumentos na chamada da funcao '%s'.", funcaoChamadaAtual->simbolo->lexema);
             }
 
             $$ = funcaoChamadaAtual->simbolo->tipo;
-            $$.addr[0] = '\0'; // Inicializa o endereço como uma string vazia
+
+            char *temp = newTemp();
+            gen("%s = call %s, %d", temp, funcaoChamadaAtual->simbolo->lexema, funcaoChamadaAtual->qtdArgumentos);
+            strcpy($$.addr, temp);
+            free(temp);
         } else {
             $$.type = 'i';
-            $$.width = 4; // setando um tipo só pra anlise continuar
-            strcpy($$.addr, "0"); //valor seguro pro parser continuar
+            $$.width = 4;
+            strcpy($$.addr, "0");
         }
 
         funcaoChamadaAtual = desalocarFuncao(funcaoChamadaAtual);
@@ -310,32 +331,42 @@ argumentos:
  */
 
 lista_argumentos:
-    lista_argumentos ',' expressao      { if (funcaoValida(funcaoChamadaAtual)) {
-                                                if (funcaoChamadaAtual->parametroAtual == NULL) {
-                                                    semanticError("argumento extra na chamada da funcao '%s'", funcaoChamadaAtual->simbolo->lexema);
-                                                } else {
-                                                    if (!(funcaoChamadaAtual->parametroAtual->ttype.type == $3.type ||
-                                                            (funcaoChamadaAtual->parametroAtual->ttype.type == 'f' && $3.type == 'i')))
-                                                        semanticError("parametros imcompativeis para a funcao '%s'", funcaoChamadaAtual->simbolo->lexema);
-                                                    funcaoChamadaAtual->parametroAtual = funcaoChamadaAtual->parametroAtual->prox;
-                                                }
-                                            }
-                                        }
-    | expressao                         { if (funcaoValida(funcaoChamadaAtual)) {
-                                                if (funcaoChamadaAtual->parametroAtual == NULL) {
-                                                    if (funcaoChamadaAtual->simbolo->parametrosFuncao == NULL) {
-                                                        semanticError("a funcao '%s' nao recebe parametros.",funcaoChamadaAtual->simbolo->lexema);
-                                                    } else {
-                                                        semanticError("argumento extra na chamada da funcao '%s'.", funcaoChamadaAtual->simbolo->lexema);
-                                                    }
-                                                } else {
-                                                    if (!(funcaoChamadaAtual->parametroAtual->ttype.type == $1.type ||
-                                                            (funcaoChamadaAtual->parametroAtual->ttype.type == 'f' && $1.type == 'i')))
-                                                        semanticError("parametros imcompativeis para a funcao '%s'", funcaoChamadaAtual->simbolo->lexema);
-                                                    funcaoChamadaAtual->parametroAtual = funcaoChamadaAtual->parametroAtual->prox;
-                                                }
-                                            }
-                                        }
+    lista_argumentos ',' expressao {
+        if (funcaoValida(funcaoChamadaAtual)) {
+            gen("param %s", $3.addr);
+            funcaoChamadaAtual->qtdArgumentos++;
+
+            if (funcaoChamadaAtual->parametroAtual == NULL) {
+                semanticError("argumento extra na chamada da funcao '%s'", funcaoChamadaAtual->simbolo->lexema);
+            } else {
+                if (!(funcaoChamadaAtual->parametroAtual->ttype.type == $3.type ||
+                        (funcaoChamadaAtual->parametroAtual->ttype.type == 'f' && $3.type == 'i')))
+                    semanticError("parametros imcompativeis para a funcao '%s'", funcaoChamadaAtual->simbolo->lexema);
+
+                funcaoChamadaAtual->parametroAtual = funcaoChamadaAtual->parametroAtual->prox;
+            }
+        }
+    }
+    | expressao {
+        if (funcaoValida(funcaoChamadaAtual)) {
+            gen("param %s", $1.addr);
+            funcaoChamadaAtual->qtdArgumentos++;
+
+            if (funcaoChamadaAtual->parametroAtual == NULL) {
+                if (funcaoChamadaAtual->simbolo->parametrosFuncao == NULL) {
+                    semanticError("a funcao '%s' nao recebe parametros.", funcaoChamadaAtual->simbolo->lexema);
+                } else {
+                    semanticError("argumento extra na chamada da funcao '%s'.", funcaoChamadaAtual->simbolo->lexema);
+                }
+            } else {
+                if (!(funcaoChamadaAtual->parametroAtual->ttype.type == $1.type ||
+                        (funcaoChamadaAtual->parametroAtual->ttype.type == 'f' && $1.type == 'i')))
+                    semanticError("parametros imcompativeis para a funcao '%s'", funcaoChamadaAtual->simbolo->lexema);
+
+                funcaoChamadaAtual->parametroAtual = funcaoChamadaAtual->parametroAtual->prox;
+            }
+        }
+    }
 ;
 
 bloco:
@@ -455,11 +486,14 @@ comando_entrada:
 comando_retorno:
     PR_RETURN expressao {
         if (tipoRetornoAtual == NULL || !funcaoValida(funcaoDeclaracaoAtual)) {
-        semanticError("Return fora de uma funcao.");
+            semanticError("Return fora de uma funcao.");
         }
         else if (!(tipoRetornoAtual->type == $2.type || (tipoRetornoAtual->type == 'f' && $2.type == 'i'))) {
             semanticError("Retorno da funcao incompativel. A funcao '%s' e tipo %c, mas o retorno e do tipo %c.",
                 funcaoDeclaracaoAtual->simbolo->lexema, tipoRetornoAtual->type, $2.type);
+        }
+        else {
+            gen("return %s", $2.addr);
         }
     }
     ';'
@@ -997,6 +1031,7 @@ Funcao* empilharFuncao(Funcao *pilhaAtual, Simbolo *simbolo, int valida) {
     novaFuncaoAtual->parametroAtual = NULL;
     novaFuncaoAtual->funcaoAnterior = pilhaAtual;
     novaFuncaoAtual->valida = valida;
+    novaFuncaoAtual->qtdArgumentos = 0;
 
     return novaFuncaoAtual;
 }
