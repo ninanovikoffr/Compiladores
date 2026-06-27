@@ -154,6 +154,9 @@ extern int column_number;
 %type <tipoDado> expressao_aritmetica
 %type <tipoDado> expressao_relacional
 %type <tipoDado> chamada_funcao
+%type <texto> operador_relacional
+%type <texto> marca_if
+%type <texto> marca_while
 
 %%
 
@@ -361,23 +364,67 @@ comando:
 ;
 
 comando_condicional:
-    PR_IF '(' expressao ')' comando %prec OPEN_IF {
-        if (!eNumerico($3)) {
-            semanticError("condicao do if deve ser numerica.");
-        }
+    marca_if comando %prec OPEN_IF {
+        gen("%s:", $1);
+        free($1);
     }
-    | PR_IF '(' expressao ')' comando PR_ELSE comando {
+    | marca_if comando PR_ELSE {
+        char *labelFim = newLabel();
+
+        gen("goto %s", labelFim);
+        gen("%s:", $1);
+
+        free($1);
+
+        $<texto>$ = labelFim;
+    } comando {
+        gen("%s:", $<texto>4);
+        free($<texto>4);
+    }
+;
+
+marca_if:
+    PR_IF '(' expressao ')' {
         if (!eNumerico($3)) {
             semanticError("condicao do if deve ser numerica.");
         }
+
+        char *labelFalso = newLabel();
+
+        gen("ifFalse %s goto %s", $3.addr, labelFalso);
+
+        $$ = labelFalso;
     }
 ;
 
 comando_repeticao:
-    PR_WHILE '(' expressao ')' comando {
-        if (!eNumerico($3)) {
+    marca_while expressao ')' {
+        if (!eNumerico($2)) {
             semanticError("condicao do while deve ser numerica.");
         }
+
+        char *labelFim = newLabel();
+
+        gen("ifFalse %s goto %s", $2.addr, labelFim);
+
+        $<texto>$ = labelFim;
+    }
+    comando {
+        gen("goto %s", $1);
+        gen("%s:", $<texto>4);
+
+        free($1);
+        free($<texto>4);
+    }
+;
+
+marca_while:
+    PR_WHILE '(' {
+        char *labelInicio = newLabel();
+
+        gen("%s:", labelInicio);
+
+        $$ = labelInicio;
     }
 ;
 
@@ -439,6 +486,11 @@ expressao_ou:
             $$.type = 'i';
             $$.width = 4;
         }
+
+        char *temp = newTemp();
+        gen("%s = %s || %s", temp, $1.addr, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
     | expressao_e {
         $$ = $1;
@@ -455,6 +507,11 @@ expressao_e:
             $$.type = 'i';
             $$.width = 4;
         }
+
+        char *temp = newTemp();
+        gen("%s = %s && %s", temp, $1.addr, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
     | expressao_not {
         $$ = $1;
@@ -471,6 +528,11 @@ expressao_not:
             $$.type = 'i';
             $$.width = 4;
         }
+
+        char *temp = newTemp();
+        gen("%s = ! %s", temp, $2.addr);
+        strcpy($$.addr, temp);
+        free(temp);
     }
     | expressao_relacional {
         $$ = $1;
@@ -479,23 +541,32 @@ expressao_not:
 
 expressao_relacional:
     expressao_aritmetica operador_relacional expressao_aritmetica {
-            if (($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')) {
-                $$.type = 'i'; $$.width = 4; 
-            } else {
-                semanticError("operador relacional exige int ou float.");
-                $$.type = 'i'; $$.width = 4;
-            }
+        if (($1.type == 'i' || $1.type == 'f') && ($3.type == 'i' || $3.type == 'f')) {
+            $$.type = 'i';
+            $$.width = 4;
+        } else {
+            semanticError("operador relacional exige int ou float.");
+            $$.type = 'i';
+            $$.width = 4;
         }
-    | expressao_aritmetica  { $$ = $1; }
+
+        char *temp = newTemp();
+        gen("%s = %s %s %s", temp, $1.addr, $2, $3.addr);
+        strcpy($$.addr, temp);
+        free(temp);
+    }
+    | expressao_aritmetica {
+        $$ = $1;
+    }
 ;
 
 operador_relacional:
-    OR_LT
-    | OR_GT
-    | OR_EQ
-    | OR_LE
-    | OR_GE
-    | OR_NE
+    OR_LT { $$ = "<"; }
+    | OR_GT { $$ = ">"; }
+    | OR_EQ { $$ = "=="; }
+    | OR_LE { $$ = "<="; }
+    | OR_GE { $$ = ">="; }
+    | OR_NE { $$ = "!="; }
 ;
 
 expressao_aritmetica:
