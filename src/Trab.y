@@ -201,10 +201,14 @@ atribuicao:
             Simbolo *existeS = usoDoIDEnv($1->lexema);
 
             if (existeS != NULL) {
-                if (existeS->tipo.type == $3.type || (existeS->tipo.type == 'f' && $3.type == 'i')) {
-                    //ainda nao precisa fazer nada
+                if (existeS->categoria == funcao) {
+                    semanticError("identificador '%s' e uma funcao, nao pode ser usado em atribuicao.", $1->lexema);
                 } else {
-                    semanticError("atribuicao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.", $1->lexema, existeS->tipo.type, $3.type);
+                    if (existeS->tipo.type == $3.type || (existeS->tipo.type == 'f' && $3.type == 'i')) {
+                        //ainda nao precisa fazer nada
+                    } else {
+                        semanticError("atribuicao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.", $1->lexema, existeS->tipo.type, $3.type);
+                    }
                 }
             }
         }     
@@ -296,12 +300,24 @@ comando:
 ;
 
 comando_condicional:
-    PR_IF '(' expressao ')' comando %prec OPEN_IF // Correção etapa2: uso de precedência para dangling else
-    | PR_IF '(' expressao ')' comando PR_ELSE comando
+    PR_IF '(' expressao ')' comando %prec OPEN_IF {
+        if (!eNumerico($3)) {
+            semanticError("condicao do if deve ser numerica.");
+        }
+    }
+    | PR_IF '(' expressao ')' comando PR_ELSE comando {
+        if (!eNumerico($3)) {
+            semanticError("condicao do if deve ser numerica.");
+        }
+    }
 ;
 
 comando_repeticao:
-    PR_WHILE '(' expressao ')' comando
+    PR_WHILE '(' expressao ')' comando {
+        if (!eNumerico($3)) {
+            semanticError("condicao do while deve ser numerica.");
+        }
+    }
 ;
 
 comando_saida:
@@ -310,7 +326,14 @@ comando_saida:
 ;
 
 comando_entrada:
-    PR_READ '(' ID ')' ';'
+    PR_READ '(' ID ')' ';'{
+        Simbolo *s = usoDoIDEnv($3->lexema);
+        if (s != NULL){
+            if (s->categoria == funcao){
+                semanticError("identificador '%s' e uma funcao, nao pode ser usado em read.", $3->lexema);
+            }
+        }
+    }
 ; 
 
 comando_retorno:
@@ -331,18 +354,51 @@ expressao:
 ;
 
 expressao_ou:
-    expressao_ou OL_OR expressao_e {$$.type = 'i'; $$.width = 4;}
-    | expressao_e { $$ = $1; }
+    expressao_ou OL_OR expressao_e {
+        if (eNumerico($1) && eNumerico($3)) {
+            $$.type = 'i';
+            $$.width = 4;
+        } else {
+            semanticError("operador '||' exige operandos numericos.");
+            $$.type = 'i';
+            $$.width = 4;
+        }
+    }
+    | expressao_e {
+        $$ = $1;
+    }
 ;
 
 expressao_e:
-    expressao_e OL_AND expressao_not {$$.type = 'i'; $$.width = 4;}
-    | expressao_not { $$ = $1; }
+    expressao_e OL_AND expressao_not {
+        if (eNumerico($1) && eNumerico($3)) {
+            $$.type = 'i';
+            $$.width = 4;
+        } else {
+            semanticError("operador '&&' exige operandos numericos.");
+            $$.type = 'i';
+            $$.width = 4;
+        }
+    }
+    | expressao_not {
+        $$ = $1;
+    }
 ;
 
 expressao_not:
-    OL_NOT expressao_relacional {$$.type = 'i'; $$.width = 4;}
-    | expressao_relacional { $$ = $1; }
+    OL_NOT expressao_relacional {
+        if (eNumerico($2)) {
+            $$.type = 'i';
+            $$.width = 4;
+        } else {
+            semanticError("operador '!' exige operando numerico.");
+            $$.type = 'i';
+            $$.width = 4;
+        }
+    }
+    | expressao_relacional {
+        $$ = $1;
+    }
 ;
 
 expressao_relacional:

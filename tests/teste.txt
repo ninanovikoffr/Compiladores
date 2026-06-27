@@ -1,0 +1,44 @@
+int $x;
+float $y;
+
+if ($x)
+    print($x);
+
+if ($y)
+    print($y);
+
+if ($x > 0)
+    print($x);
+
+if ($x && $y)
+    print($x);
+
+
+if ($x)
+    print($x);
+
+if ($y)
+    print($y);
+
+if ($x > 0)
+    print($x);
+
+if ($x && $y)
+    print($x);
+
+int $soma(int $a, int $b) {
+    return $a + $b;
+}
+
+read($soma);
+
+read($naoExiste);
+
+int $f(int $x) {
+    read($x);
+    return $x;
+}
+
+$x = 10;
+
+$soma = 10;

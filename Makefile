@@ -6,7 +6,7 @@ SRC_DIR := src
 BUILD_DIR := build
 OUTPUT_DIR := output
 TARGET := $(OUTPUT_DIR)/saida
-TEST_INPUT := tests/teste_parser.txt
+TEST_INPUT := tests/teste.txt
 
 PARSER_C := $(BUILD_DIR)/parser.c
 PARSER_H := $(BUILD_DIR)/parser.h
