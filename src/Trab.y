@@ -95,6 +95,7 @@ extern int column_number;
 
     char* newTemp(void);
     char* newLabel(void);
+    char* widen(const char *addr, char tipoOrigem, char tipoDestino);
     void espacoCodigo(size_t caracteres);
     void gen(const char *formato, ...);
     void print_codigo_intermediario(void);
@@ -164,17 +165,14 @@ extern int column_number;
 S:
     { criarEnv(); } 
     elementos
-    { /*fecharEnv(); */} //fechar so no final, deixar aberto enquanto fazemos o codigo
+    { fecharEnv(); }
     
 ; 
 
 elementos:
     elementos elemento
     | elemento
-    | elementos error ';' { yyerrok; } //Desse jeito continua 11 erros sintaticos, com os outros vira 14
-    //| elementos error '}' { yyerrok; } 
-    //| error ';' { yyerrok; }
-    //| error '}' { yyerrok; }
+    | elementos error ';' { yyerrok; }
 ; 
 
 elemento:
@@ -203,7 +201,9 @@ item_declaracao_variavel:
     | ID OP_ATRIBUICAO expressao {
         if (tipoAtual.type == $3.type || (tipoAtual.type == 'f' && $3.type == 'i')) {
             addSimbolo($1->lexema, tipoAtual, variavel);
-            gen("%s = %s", $1->lexema, $3.addr);
+            char *addr = widen($3.addr, $3.type, tipoAtual.type);
+            gen("%s = %s", $1->lexema, addr);
+            free(addr);
         } else {
             semanticError("Inicializacao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.",
                    $1->lexema, tipoAtual.type, $3.type);
@@ -223,7 +223,9 @@ atribuicao:
                     semanticError("identificador '%s' e uma funcao, nao pode ser usado em atribuicao.", $1->lexema);
                 } else {
                     if (existeS->tipo.type == $3.type || (existeS->tipo.type == 'f' && $3.type == 'i')) {
-                        gen("%s = %s", $1->lexema, $3.addr);
+                        char *addr = widen($3.addr, $3.type, existeS->tipo.type);
+                        gen("%s = %s", $1->lexema, addr);
+                        free(addr);
                     } else {
                         semanticError("atribuicao incompativel. Variavel '%s' e tipo %c, mas recebeu tipo %c.", $1->lexema, existeS->tipo.type, $3.type);
                     }
@@ -333,7 +335,16 @@ argumentos:
 lista_argumentos:
     lista_argumentos ',' expressao {
         if (funcaoValida(funcaoChamadaAtual)) {
-            gen("param %s", $3.addr);
+            char *addr = NULL;
+
+            if (funcaoChamadaAtual->parametroAtual != NULL) {
+                addr = widen($3.addr, $3.type, funcaoChamadaAtual->parametroAtual->ttype.type);
+            } else {
+                addr = widen($3.addr, $3.type, $3.type);
+            }
+
+            gen("param %s", addr);
+            free(addr);
             funcaoChamadaAtual->qtdArgumentos++;
 
             if (funcaoChamadaAtual->parametroAtual == NULL) {
@@ -349,7 +360,16 @@ lista_argumentos:
     }
     | expressao {
         if (funcaoValida(funcaoChamadaAtual)) {
-            gen("param %s", $1.addr);
+            char *addr = NULL;
+
+            if (funcaoChamadaAtual->parametroAtual != NULL) {
+                addr = widen($1.addr, $1.type, funcaoChamadaAtual->parametroAtual->ttype.type);
+            } else {
+                addr = widen($1.addr, $1.type, $1.type);
+            }
+
+            gen("param %s", addr);
+            free(addr);
             funcaoChamadaAtual->qtdArgumentos++;
 
             if (funcaoChamadaAtual->parametroAtual == NULL) {
@@ -379,7 +399,7 @@ comandos:
     /* vazio */
     | comandos comando
     | comandos error ';' { yyerrok; } // Recuperação de erro em instruções com ponto e vírgula 
-    | comandos error '}' { yyerrok; } // Recuperação de erro em fechamentos de blocos estruturados 
+    | comandos error '}' { yyerrok; } // e de blocos estruturados 
 ;
 
 comando:
@@ -420,11 +440,11 @@ marca_if:
             semanticError("condicao do if deve ser numerica.");
         }
 
-        char *labelFalso = newLabel();
+        char *labelFalse = newLabel();
 
-        gen("ifFalse %s goto %s", $3.addr, labelFalso);
+        gen("ifFalse %s goto %s", $3.addr, labelFalse);
 
-        $$ = labelFalso;
+        $$ = labelFalse;
     }
 ;
 
@@ -493,7 +513,9 @@ comando_retorno:
                 funcaoDeclaracaoAtual->simbolo->lexema, tipoRetornoAtual->type, $2.type);
         }
         else {
-            gen("return %s", $2.addr);
+            char *addr = widen($2.addr, $2.type, tipoRetornoAtual->type);
+            gen("return %s", addr);
+            free(addr);
         }
     }
     ';'
@@ -522,8 +544,19 @@ expressao_ou:
         }
 
         char *temp = newTemp();
-        gen("%s = %s || %s", temp, $1.addr, $3.addr);
+        char *labelTrue = newLabel();
+        char *labelFim = newLabel();
+
+        gen("if %s goto %s", $1.addr, labelTrue);
+        gen("if %s goto %s", $3.addr, labelTrue);
+        gen("%s = 0", temp);
+        gen("goto %s", labelFim);
+        gen("%s:", labelTrue);
+        gen("%s = 1", temp);
+        gen("%s:", labelFim);
         strcpy($$.addr, temp);
+        free(labelTrue);
+        free(labelFim);
         free(temp);
     }
     | expressao_e {
@@ -543,8 +576,19 @@ expressao_e:
         }
 
         char *temp = newTemp();
-        gen("%s = %s && %s", temp, $1.addr, $3.addr);
+        char *labelFalse = newLabel();
+        char *labelFim = newLabel();
+
+        gen("ifFalse %s goto %s", $1.addr, labelFalse);
+        gen("ifFalse %s goto %s", $3.addr, labelFalse);
+        gen("%s = 1", temp);
+        gen("goto %s", labelFim);
+        gen("%s:", labelFalse);
+        gen("%s = 0", temp);
+        gen("%s:", labelFim);
         strcpy($$.addr, temp);
+        free(labelFalse);
+        free(labelFim);
         free(temp);
     }
     | expressao_not {
@@ -564,8 +608,18 @@ expressao_not:
         }
 
         char *temp = newTemp();
-        gen("%s = ! %s", temp, $2.addr);
+        char *labelTrue = newLabel();
+        char *labelFim = newLabel();
+
+        gen("ifFalse %s goto %s", $2.addr, labelTrue);
+        gen("%s = 0", temp);
+        gen("goto %s", labelFim);
+        gen("%s:", labelTrue);
+        gen("%s = 1", temp);
+        gen("%s:", labelFim);
         strcpy($$.addr, temp);
+        free(labelTrue);
+        free(labelFim);
         free(temp);
     }
     | expressao_relacional {
@@ -584,9 +638,15 @@ expressao_relacional:
             $$.width = 4;
         }
 
+        char tipoComparacao = ($1.type == 'f' || $3.type == 'f') ? 'f' : $1.type;
+        char *addr1 = widen($1.addr, $1.type, tipoComparacao);
+        char *addr3 = widen($3.addr, $3.type, tipoComparacao);
         char *temp = newTemp();
-        gen("%s = %s %s %s", temp, $1.addr, $2, $3.addr);
+
+        gen("%s = %s %s %s", temp, addr1, $2, addr3);
         strcpy($$.addr, temp);
+        free(addr1);
+        free(addr3);
         free(temp);
     }
     | expressao_aritmetica {
@@ -607,17 +667,27 @@ expressao_aritmetica:
     expressao_aritmetica OA_PLUS expressao_termo {
         $$ = tipoResultante($1, $3, "+");
 
+        char *addr1 = widen($1.addr, $1.type, $$.type);
+        char *addr3 = widen($3.addr, $3.type, $$.type);
         char *temp = newTemp();
-        gen("%s = %s + %s", temp, $1.addr, $3.addr);
+
+        gen("%s = %s + %s", temp, addr1, addr3);
         strcpy($$.addr, temp);
+        free(addr1);
+        free(addr3);
         free(temp);
     }
     | expressao_aritmetica OA_MINUS expressao_termo {
         $$ = tipoResultante($1, $3, "-");
 
+        char *addr1 = widen($1.addr, $1.type, $$.type);
+        char *addr3 = widen($3.addr, $3.type, $$.type);
         char *temp = newTemp();
-        gen("%s = %s - %s", temp, $1.addr, $3.addr);
+
+        gen("%s = %s - %s", temp, addr1, addr3);
         strcpy($$.addr, temp);
+        free(addr1);
+        free(addr3);
         free(temp);
     }
     | expressao_termo {
@@ -629,17 +699,27 @@ expressao_termo:
     expressao_termo OA_MULT expressao_fator {
         $$ = tipoResultante($1, $3, "*");
 
+        char *addr1 = widen($1.addr, $1.type, $$.type);
+        char *addr3 = widen($3.addr, $3.type, $$.type);
         char *temp = newTemp();
-        gen("%s = %s * %s", temp, $1.addr, $3.addr);
+
+        gen("%s = %s * %s", temp, addr1, addr3);
         strcpy($$.addr, temp);
+        free(addr1);
+        free(addr3);
         free(temp);
     }
     | expressao_termo OA_DIV expressao_fator {
         $$ = tipoResultante($1, $3, "/");
 
+        char *addr1 = widen($1.addr, $1.type, $$.type);
+        char *addr3 = widen($3.addr, $3.type, $$.type);
         char *temp = newTemp();
-        gen("%s = %s / %s", temp, $1.addr, $3.addr);
+
+        gen("%s = %s / %s", temp, addr1, addr3);
         strcpy($$.addr, temp);
+        free(addr1);
+        free(addr3);
         free(temp);
     }
     | expressao_termo OA_MOD expressao_fator {
@@ -760,7 +840,6 @@ void yyerror(const char *s) {
     sintatic_error_count++;
 }
 
-// Etapa 3
 
 void print_analise_semantica(void) {
     printf("\n");
@@ -834,6 +913,17 @@ char* newLabel(void) {
     label_cont++;
 
     return label;
+}
+
+char* widen(const char *addr, char tipoOrigem, char tipoDestino) {
+    if (tipoOrigem == 'i' && tipoDestino == 'f') {
+        char *temp = newTemp();
+        gen("%s = (float) %s", temp, addr);
+        return temp;
+    }
+
+    char *copia = strdup(addr);
+    return copia;
 }
 
 void espacoCodigo(size_t caracteres){
