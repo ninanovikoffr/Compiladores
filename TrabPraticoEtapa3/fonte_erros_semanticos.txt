@@ -1,0 +1,58 @@
+// Funcoes usadas pelos testes de chamadas e uso incorreto de identificadores
+int $doisArgs(int $inteiro, float $real) {
+    return $inteiro;
+}
+
+int $semArgs() {
+    return 1;
+}
+
+// Retorno float em uma funcao int
+int $retornoIncompativel() {
+    return 1.5;
+}
+
+// Funcao tipada retornando sem valor
+int $retornoSemValor() {
+    return;
+}
+
+// Parametro duplicado no mesmo escopo
+int $parametroDuplicado(int $valor, float $valor) {
+    return 1;
+}
+
+// Declaracao duplicada no escopo global
+int $duplicada;
+float $duplicada;
+
+int $inteiro = 1;
+float $real = 2.5;
+
+// Inicializacao e atribuicao com tipos incompativeis
+int $inicializacaoIncompativel = $real;
+$inteiro = $real;
+
+// Identificadores nao declarados
+$naoDeclarada = 10;
+print($tambemNaoDeclarada);
+read($outraNaoDeclarada);
+
+// Tentativa de chamar uma variavel como funcao
+$inteiro();
+
+// Quantidades e tipos de argumentos incorretos
+$doisArgs();
+$doisArgs(1);
+$doisArgs(1, 2.0, 3);
+$doisArgs(1.5, 2.0);
+$semArgs(1);
+
+// Uso de funcao em contextos reservados a variaveis
+$semArgs = 1;
+read($semArgs);
+print($semArgs);
+
+// Returns fora de uma funcao
+return 1;
+return;
